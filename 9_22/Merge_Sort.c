@@ -34,7 +34,7 @@ void merge_sort(ElementType * A, int low, int high)
 int main(int argc, char const *argv[])
 {
 	clock_t start, finish;
-	int N = 10000;
+	int N = 1000000;
 	srand(time(NULL));
 	int a[N];
 	for (int i=0;i<N;i++)
