@@ -27,6 +27,7 @@ void merge_process(ElementType * A, int low, int high)
 		merge_process(A, low, mid);
 		merge_process(A, mid+1, high);
 		merge(A, low, mid, high);
+		// Recursion
 	}
 }
 
