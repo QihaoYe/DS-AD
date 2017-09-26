@@ -4,7 +4,7 @@
 #define ElementType int
 
 
-void quick_sort(ElementType * A, int p, int q)
+void quick_process(ElementType * A, int p, int q)
 {
 	if (p >= q) return;
 	ElementType x = *(A+p), temp;
@@ -22,8 +22,14 @@ void quick_sort(ElementType * A, int p, int q)
 	temp = *(A+p);
 	*(A+p) = *(A+i);
 	*(A+i) = temp;
-	quick_sort(A, p, i-1);
-	quick_sort(A, i+1, q);
+	quick_process(A, p, i-1);
+	quick_process(A, i+1, q);
+}
+
+
+void quick_sort(ElementType * A, int N)
+{
+	quick_process(A, 0, N-1);
 }
 
 
@@ -41,7 +47,7 @@ int main(int argc, char const *argv[])
 	}
 	// Initialize a random array
 	start = clock();
-	quick_sort(a, 0, N-1);
+	quick_sort(a, N);
 	// Quick Sort
 	// Order: small -> large
 	finish = clock();
