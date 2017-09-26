@@ -7,6 +7,7 @@
 void quick_process(ElementType * A, int p, int q)
 {
 	if (p >= q) return;
+	// Used to cancel the recursion when the begin behind the end
 	ElementType x = *(A+p), temp;
 	int i = p;
 	for (int j=p+1;j<=q;j++)
@@ -24,6 +25,7 @@ void quick_process(ElementType * A, int p, int q)
 	*(A+i) = temp;
 	quick_process(A, p, i-1);
 	quick_process(A, i+1, q);
+	// Recursion
 }
 
 
