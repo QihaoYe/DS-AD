@@ -14,8 +14,9 @@ void merge(ElementType * A, int low, int mid, int high)
 		*(result+k++) = *(A+i++);
 	while (j <= high)
 		*(result+k++) = *(A+j++);
-	for (;k>0;k--)
-		*(A+++low) = *(result++);
+	for (k--;k>=0;k--)
+		*(A--+high) = *(result+k);
+	free(result);
 }
 
 
