@@ -11,9 +11,7 @@ void insertion_sort(ElementType * A, int N)
 		ElementType temp = *(A+i);
 		int j;
 		for (j=i;j>0 && temp < *(A+j-1);j--)
-		{
 			*(A+j) = *(A+j-1);
-		}
 		*(A+j) = temp;
 	}
 }
