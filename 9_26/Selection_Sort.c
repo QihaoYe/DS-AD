@@ -6,14 +6,29 @@
 
 void selection_sort(ElementType * A, int N)
 {
-	quick_process(A, 0, N-1);
+	for (int i=0;i<N;i++)
+	{
+		ElementType min = *(A + i);
+		int index = i;
+		for (int j=i+1;j<N;j++)
+		{
+			if (*(A + j) < min)
+			{
+				min = *(A + j);
+				index = j;
+			}
+		}
+		*(A + index) = *(A + i);
+		*(A + i) = min;
+		// Moving ahead the minimum
+	}
 }
 
 
 int main(int argc, char const *argv[])
 {
 	clock_t start, finish;
-	int N = 1000000;
+	int N = 10000;
 	// Set a large N
 	srand(time(NULL));
 	// Set a random seed
@@ -24,7 +39,7 @@ int main(int argc, char const *argv[])
 	}
 	// Initialize a random array
 	start = clock();
-	// selection_sort(a, N);
+	selection_sort(a, N);
 	// Selection Sort
 	// Order: small -> large
 	finish = clock();
