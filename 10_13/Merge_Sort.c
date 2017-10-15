@@ -52,6 +52,11 @@ int main(int argc, char const *argv[])
 	{
 		a[i] = rand() % 1000000 + 1;
 	}
+	for (int i=0;i<N;i++)
+	{
+		printf("%d ", a[i]);
+	}
+	printf("\n");
 	// Initialize a random array
 	start = clock();
 	merge_sort(a, N);
