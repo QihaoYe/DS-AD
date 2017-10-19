@@ -43,20 +43,15 @@ void merge_sort(ElementType *A, int N)
 int main(int argc, char const *argv[])
 {
 	clock_t start, finish;
-	int N = 1000000;
+	int N = 100000;
 	// Set a large N
 	srand(time(NULL));
 	// Set a random seed
 	int a[N];
 	for (int i=0;i<N;i++)
 	{
-		a[i] = rand() % 1000000 + 1;
+		a[i] = rand() % 10000 + 1;
 	}
-	for (int i=0;i<N;i++)
-	{
-		printf("%d ", a[i]);
-	}
-	printf("\n");
 	// Initialize a random array
 	start = clock();
 	merge_sort(a, N);
