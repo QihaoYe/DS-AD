@@ -12,6 +12,7 @@
 #else
 #define Debug(code) 
 #endif
+// Debug switch
 
 
 typedef struct ListNode
@@ -77,6 +78,7 @@ void destroy(ListNode ** head)
 	free(*head);
 	*head = NULL;
 }
+// Free all the spaces in the list and redirect the head to the NULL pointer
 
 
 int calculate_length(ListNode * head)
@@ -162,6 +164,7 @@ ElementType * get_value_pointer(ListNode * head, int i)
 ElementType get_value(ListNode * head, int i)
 {
 	return *get_value_pointer(head, i);
+	// If we get NULL, then this program will abort
 }
 
 
@@ -172,12 +175,13 @@ void print(ListNode * head)
 		printf("%d ", head->value);
 		Debug(printf("%p %p\n", head, head->next);)
 		print(head->next);
+		// Recursion
 	}
 	else printf("\n");
 }
 
 
-void insert(ListNode ** head, int i, ListNode * node)
+void insert(ListNode ** head, int i, ElementType key)
 {
 	do
 	{
@@ -191,6 +195,8 @@ void insert(ListNode ** head, int i, ListNode * node)
 			fprintf(stderr, "%s\n", "Invalid index selected!");
 			break;
 		}
+		ListNode * node = create(1);
+		node->value = key;
 		ListNode * p1 = *(head);
 		if (i == 0)
 		{
@@ -200,7 +206,7 @@ void insert(ListNode ** head, int i, ListNode * node)
 		}
 		ListNode * p2;
 		while ((p2 = p1->next) && --i) p1 = p2;
-		if (NULL == p2 && i > 1)
+		if (NULL == p2 && i > 1) // Allow to insert at the end fo the list
 		{
 			printf("%d\n", i);
 			fprintf(stderr, "%s\n", "Index out of bound!");
@@ -269,20 +275,15 @@ void test(ListNode * head)
 
 int main(int argc, char const *argv[])
 {
-	ListNode * a, * b, * c = (ListNode *)malloc(sizeof(ListNode));
+	ListNode * a, * b;
 	a = create(10);
 	b = create(5);
-	// c = create(1);
-	c->value = 999;
-	c->next = NULL;
 	test(a);
 	// Initialize
 	printf("%s", "a[] = ");
 	print(a);
 	printf("%s", "b[] = ");
 	print(b);
-	printf("%s", "c[] = ");
-	print(c);
 
 	printf("\n");
 	printf("a.length = %d\n", calculate_length(a));
@@ -299,28 +300,82 @@ int main(int argc, char const *argv[])
 	printf("Search 123 in a: %d\n", search(a, 123));
 
 	printf("\n");
-	printf("a[5] = %d\n", get_value(a, 5));
+	for (int i=0;i<calculate_length(a);i++)
+		printf("a[%d] = %d\n", i, get_value(a, i));
 
 	printf("\n");
-	printf("%s\n", "---Insert c at a[9]---");
-	insert(&a, 9, c);
+	printf("%s\n", "---Insert 111 at a[0]---");
+	insert(&a, 0, 111);
 	print(a);
-	print(c);
-	// printf("%s\n", "---Insert c at a[4]---");
-	// insert(&a, 4, c);
-	// print(a);
-	// printf("%s\n", "---Insert c at a[0]---");
-	// insert(&a, 0, c);
-	// print(a);
+	printf("%s\n", "---Insert 222 at a[5]---");
+	insert(&a, 5, 222);
+	print(a);
+	printf("%s\n", "---Insert 333 at a[11]---");
+	insert(&a, 11, 333);
+	print(a);
 
+	printf("\n");
+	printf("%s\n", "---Merge a[] and b[] as a[]---");
 	a = merge(a, b);
+	printf("%s", "a[] = ");
 	print(a);
+
+	printf("\n");
+	printf("%s\n", "---Reverse a[]---");
 	reverse(&a);
+	printf("%s", "a[] = ");
 	print(a);
+	printf("%s\n", "---Reverse a[]---");
 	a = reversed(a);
+	printf("%s", "a[] = ");
 	print(a);
+
+	printf("\n");
+	printf("%s\n", "---Destroy a[]---");
 	destroy(&a);
+	printf("%s", "a[] = ");
 	print(a);
-	printf("Length: %d\n", calculate_length(a));
 	return 0;
 }
+
+// -----[test result]-----
+// a[] = 0 1 2 3 4 5 6 7 8 9 
+// b[] = 0 0 0 0 0 
+
+// a.length = 10
+
+// ---Delete a[6]---
+// a[] = 0 1 2 3 4 5 7 8 9 
+
+// Search 3 in a: 1
+// Search 6 in a: 0
+// Search 123 in a: 0
+
+// a[0] = 0
+// a[1] = 1
+// a[2] = 2
+// a[3] = 3
+// a[4] = 4
+// a[5] = 5
+// a[6] = 7
+// a[7] = 8
+// a[8] = 9
+
+// ---Insert 111 at a[0]---
+// 111 0 1 2 3 4 5 7 8 9 
+// ---Insert 222 at a[5]---
+// 111 0 1 2 3 222 4 5 7 8 9 
+// ---Insert 333 at a[11]---
+// 111 0 1 2 3 222 4 5 7 8 9 333 
+
+// ---Merge a[] and b[] as a[]---
+// a[] = 111 0 1 2 3 222 4 5 7 8 9 333 0 0 0 0 0 
+
+// ---Reverse a[]---
+// a[] = 0 0 0 0 0 333 9 8 7 5 4 222 3 2 1 0 111 
+// ---Reverse a[]---
+// a[] = 111 0 1 2 3 222 4 5 7 8 9 333 0 0 0 0 0 
+
+// ---Destroy a[]---
+// a[] = 
+// -----[test result]-----
