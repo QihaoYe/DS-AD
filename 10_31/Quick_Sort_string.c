@@ -78,7 +78,6 @@ int main(int argc, char const *argv[])
 	srand(time(NULL));
 	// Set a random seed
 	ElementType a[N];
-	int len;
 	for (int i=0;i<N;i++)
 	{
 		a[i] = random_string(rand() % 14 + 1);
