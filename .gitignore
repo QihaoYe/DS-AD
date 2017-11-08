@@ -1,5 +1,6 @@
 
 .DS_Store
+Lecture/*
 9_19/Insertion_Sort
 test/test001
 test/test003
