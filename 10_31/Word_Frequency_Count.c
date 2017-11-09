@@ -1,7 +1,5 @@
 #include <stdio.h>
 
-#define ElementType char *
-#define fatal_error(code) fprintf(stderr, code)
 #define _DEBUG
 #ifdef _DEBUG
 #define debug(code) code
@@ -9,11 +7,36 @@
 #define debug(code)
 #endif
 
+#define ElementType char *
+#define fatal_error(code) fprintf(stderr, code)
+#define error(code) fprintf(stderr, code)
+#define MinTableSize 5000
+
 typedef struct HashTable
 {
 	int TableSize;
-	Cell TheCells;
+	ElementType *Cell;
 }HashTable;
+
+HashTable initialize_table(int TableSize)
+{
+	HashTable H;
+	if (TableSize < MinTableSize)
+	{
+		error("Too small Hash Table!");
+		return NULL;
+	}
+	H = (HashTable *)malloc(sizeof(HashTable));
+	if (NULL == H)
+		fatal_error("No enough space!");
+	H->TableSize = NextPrime(TableSize);
+	H->Cell = (ElementType *)malloc(TableSize * sizeof(ElementType));
+	if (NULL == H->Cell)
+		fatal_error("No enough space!");
+	for (int i=0; i < H->TableSize; i++)
+		H->Cell[i] = NULL;
+	return H;
+}
 
 int main(int argc, char const *argv[])
 {

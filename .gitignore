@@ -26,3 +26,4 @@ test/test002
 10_31/Quick_Sort_float
 10_31/Quick_Sort_int
 11_07/KMP
+*.py
