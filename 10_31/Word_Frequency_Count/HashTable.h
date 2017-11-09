@@ -36,6 +36,8 @@ int Hash(int TableSize, ElementType Word);
 HashTable InitializeTable(int TableSize);
 Position Find(HashTable H, ElementType Word);
 void Insert(HashTable H, ElementType Word);
+void destroy(List * head);
+void DestroyTable(HashTable H);
 
 
 #endif

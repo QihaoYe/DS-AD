@@ -86,6 +86,7 @@ void Insert(HashTable H, ElementType Word)
 {
 	int HashValue;
 	List Node;
+	List NewPosition;
 	if (NULL == H)
 	{
 		FatalError("The Hash Table is not established yet!");
@@ -102,13 +103,41 @@ void Insert(HashTable H, ElementType Word)
 		return;
 	}
 	if (NULL != (Node = Find(H, Word)))
+	{
 		Node->Frequency++;
+		return;
+	}
 	Node = H->TheLists[HashValue];
 	while (NULL != Node->Next)
 		Node = Node->Next;
-	Node->Next = (List)malloc(sizeof(struct ListNode));
-	Node->Next->Frequency = 1;
-	Node->Next->Element = Word;
-	Node->Next->Next = NULL;
+	NewPosition = (List)malloc(sizeof(struct ListNode));
+	NewPosition->Frequency = 1;
+	NewPosition->Element = Word;
+	NewPosition->Next = NULL;
+	Node->Next = NewPosition;
 }
+
+
+void destroy(List * head)
+{
+	if (NULL == *head || NULL == head) return;
+	List p;
+	while ((p = (*head)->Next))
+	{
+		free(*head);
+		*head = p;
+	}
+	free(*head);
+	*head = NULL;
+}
+
+
+void DestroyTable(HashTable H)
+{
+	for (int i=0; i < H->TableSize; i++)
+		destroy(&H->TheLists[i]);
+	free(H);
+}
+
+
 

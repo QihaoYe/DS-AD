@@ -6,8 +6,6 @@ SRCS = Word_Frequency_Count.c \
 		
 OBJS = $(SRCS:.c=.o) 
 $(TARGET) : $(OBJS)
-	# echo TARGET:$@
-	# echo OBJECTS:$^
 
 	$(CC) $(CFLAGS)  -o $@ $^
 

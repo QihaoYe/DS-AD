@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <ctype.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <String.h>
 #include "HashTable.h"
@@ -16,6 +18,8 @@
 ElementType GetAWord(FILE * fp)
 {
 	char Buff[MAX_LENGTH];
+	char Temp[MAX_LENGTH];
+	int Counter = 0;
 	ElementType Word;
 	while (!feof(fp))
 	{
@@ -27,63 +31,58 @@ ElementType GetAWord(FILE * fp)
 	}
 	if (strlen(Buff) == 1 && Buff[0] == ' ')
 		return NULL;
-	Word = (ElementType)malloc((strlen(Buff) + 1) * sizeof(char));
-	fscanf(Buff, "%s", Word);
+	for (int i=0; i < strlen(Buff); i++)
+	{
+		if (('a'<=Buff[i] && Buff[i]<='z') || ('A'<=Buff[i] && Buff[i]<='Z'))
+			Temp[Counter++] = Buff[i] > 96 ? Buff[i] : Buff[i] + 32;
+		// Get alpha only and ignore cases
+	}
+	Temp[Counter] = '\0';
+	if (strlen(Temp) == 0)
+		return NULL;
+	Word = (ElementType)malloc((strlen(Temp) + 1) * sizeof(char));
+	Word[strlen(Temp)] = '\0';
+	strcpy(Word, Temp);
 	return Word;
 }
 
 
 int main(int argc, char const *argv[])
 {
-	int TableSize = 10000;
-	int wordcount = 0, length;
+	int TableSize = 5000;
+	int wordcount = 0;
 	HashTable H;
 	ElementType Word;
+	char document[5 * MAX_LENGTH];
+	strcpy(document, argv[0]);
+	for (int i=strlen(document) - 1; i >= 0; i--)
+	{
+		if (document[i] == '/')
+			break;
+		document[i] = '\0';
+	}
+	strcat(document, "source.txt");
 	FILE * fp;
-	char document[] = "source.txt";
 	H = InitializeTable(TableSize);
+	debug(printf("%s\n", document));
 	if (NULL == (fp = fopen(document,"r")))
 		FatalError("Can not open the file!\n");
 	while (!feof(fp))
 	{
 		Word = GetAWord(fp);
-		printf("%s\n", Word);
+		if (NULL != Word)
+		{
+			wordcount++;
+			printf("%s\n", Word);
+			Insert(H, Word);
+		}
 	}
 	fclose(fp);
-	// HashTable H = InitializeTable(6000);
-	// Insert(H, "abcd");
-	// Insert(H, "abcd");
-	// Insert(H, "abcd");
-	// int a = Hash(H->TableSize, "abcd");
-	// printf("%d\n", a);
-	// printf("%d\n", H->TheLists[a]->Frequency);
-	// printf("%s\n", H->TheLists[a]->Element);
+	printf("Valid words count: %d\n", wordcount);
+	for (int i=0;i<H->TableSize;i++)
+	{
+		printf("%s\n", H->TheLists[i]->Element);
+	}
+	DestroyTable(H);
 	return 0;
 }
-
-// int main(int argc, char const *argv[])
-// {
-// 	int TableSize = 10000;
-// 	int wordcount = 0, length;
-// 	HashTable H;
-// 	ElementType word;
-// 	FILE *fp;
-// 	char document[] = "source.txt";
-// 	H = InitializeTable(TableSize);
-// 	if (NULL == (fp = fopen(document, "r")))
-// 		FatalError("Can not open the file!\n");
-// 	while (!feof(fp))
-// 	{
-// 		length = GetAWord(fp, word);
-// 		if (length > 3)
-// 		{
-// 			wordcount++;
-// 			InsertAndCount(word, H);
-// 		}
-// 	}
-// 	fclose(fp);
-// 	printf("Valid words count: %d\n", wordcount);
-// 	Show(H, 10.0 / 100);
-// 	DestroyTable(H);
-// 	return 0;
-// }
