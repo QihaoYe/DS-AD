@@ -34,6 +34,7 @@ int NotPrime(int N);
 int NextPrime(int N);
 int Hash(int TableSize, ElementType Word);
 HashTable InitializeTable(int TableSize);
+Position Find(HashTable H, ElementType Word);
 void Insert(HashTable H, ElementType Word);
 
 

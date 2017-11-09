@@ -60,15 +60,55 @@ HashTable InitializeTable(int TableSize)
 }
 
 
+Position Find(HashTable H, ElementType Word)
+{
+	int HashValue;
+	Position Node;
+	if (NULL == H)
+	{
+		FatalError("The Hash Table is not established yet!");
+		return NULL;
+	}
+	HashValue = Hash(H->TableSize, Word);
+	if (NULL == (Node = H->TheLists[HashValue]))
+		return NULL;
+	while (Node)
+	{
+		if (!strcmp(Node->Element, Word))
+			return Node;
+		Node = Node->Next;
+	}
+	return NULL;
+}
+
+
 void Insert(HashTable H, ElementType Word)
 {
 	int HashValue;
+	List Node;
 	if (NULL == H)
 	{
 		FatalError("The Hash Table is not established yet!");
 		return;
 	}
 	HashValue = Hash(H->TableSize, Word);
-	// if (NULL == H->TheLists[HashValue])
+	if (NULL == H->TheLists[HashValue])
+	{
+		Node = (List)malloc(sizeof(struct ListNode));
+		Node->Frequency = 1;
+		Node->Element = Word;
+		Node->Next = NULL;
+		H->TheLists[HashValue] = Node;
+		return;
+	}
+	if (NULL != (Node = Find(H, Word)))
+		Node->Frequency++;
+	Node = H->TheLists[HashValue];
+	while (NULL != Node->Next)
+		Node = Node->Next;
+	Node->Next = (List)malloc(sizeof(struct ListNode));
+	Node->Next->Frequency = 1;
+	Node->Next->Element = Word;
+	Node->Next->Next = NULL;
 }
 
