@@ -51,7 +51,7 @@ HashTable InitializeTable(int TableSize)
 	if (NULL == H)
 		FatalError("No enough space!");
 	H->TableSize = NextPrime(TableSize);
-	H->TheLists = (List *)malloc(H->TableSize * sizeof(struct ListNode));
+	H->TheLists = (List *)malloc(H->TableSize * sizeof(List));
 	if (NULL == H->TheLists)
 		FatalError("No enough space!");
 	for (int i=0; i < TableSize; i++)
@@ -72,7 +72,7 @@ Position Find(HashTable H, ElementType Word)
 	HashValue = Hash(H->TableSize, Word);
 	if (NULL == (Node = H->TheLists[HashValue]))
 		return NULL;
-	while (Node)
+	while (NULL != Node)
 	{
 		if (!strcmp(Node->Element, Word))
 			return Node;
@@ -96,6 +96,8 @@ void Insert(HashTable H, ElementType Word)
 	if (NULL == H->TheLists[HashValue])
 	{
 		Node = (List)malloc(sizeof(struct ListNode));
+		if (NULL == Node)
+			FatalError("No enough space!");
 		Node->Frequency = 1;
 		Node->Element = Word;
 		Node->Next = NULL;
@@ -111,6 +113,8 @@ void Insert(HashTable H, ElementType Word)
 	while (NULL != Node->Next)
 		Node = Node->Next;
 	NewPosition = (List)malloc(sizeof(struct ListNode));
+	if (NULL == NewPosition)
+		FatalError("No enough space!");
 	NewPosition->Frequency = 1;
 	NewPosition->Element = Word;
 	NewPosition->Next = NULL;

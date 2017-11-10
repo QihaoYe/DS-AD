@@ -5,7 +5,8 @@
 
 #define FatalError(code) fprintf(stderr, code)
 #define Error(code) fprintf(stderr, code)
-#define MinTableSize 5000
+#define MinTableSize 2000
+#define MAX_LENGTH 64
 #define ElementType char *
 
 

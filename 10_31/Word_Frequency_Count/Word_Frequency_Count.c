@@ -12,15 +12,12 @@
 #define debug(code)
 #endif
 
-#define MAX_LENGTH 64
 
-
-ElementType GetAWord(FILE * fp)
+int GetAWord(FILE * fp, ElementType * Word)
 {
 	char Buff[MAX_LENGTH];
 	char Temp[MAX_LENGTH];
 	int Counter = 0;
-	ElementType Word;
 	while (!feof(fp))
 	{
 		fscanf(fp, "%s", Buff);
@@ -30,29 +27,28 @@ ElementType GetAWord(FILE * fp)
 			break;
 	}
 	if (strlen(Buff) == 1 && Buff[0] == ' ')
-		return NULL;
+		return 0;
 	for (int i=0; i < strlen(Buff); i++)
 	{
-		if (('a'<=Buff[i] && Buff[i]<='z') || ('A'<=Buff[i] && Buff[i]<='Z'))
+		if (('a' <= Buff[i] && Buff[i] <= 'z') || ('A' <= Buff[i] && Buff[i] <= 'Z'))
 			Temp[Counter++] = Buff[i] > 96 ? Buff[i] : Buff[i] + 32;
-		// Get alpha only and ignore cases
+		// Get alpha only and change into lower cases
 	}
 	Temp[Counter] = '\0';
 	if (strlen(Temp) == 0)
-		return NULL;
-	Word = (ElementType)malloc((strlen(Temp) + 1) * sizeof(char));
-	Word[strlen(Temp)] = '\0';
-	strcpy(Word, Temp);
-	return Word;
+		return 0;
+	*Word = (ElementType)malloc((strlen(Temp) + 1) * sizeof(char));
+	strcpy(*Word, Temp);
+	return 1;
 }
 
 
 int main(int argc, char const *argv[])
 {
-	int TableSize = 5000;
+	int TableSize = 3000;
 	int wordcount = 0;
 	HashTable H;
-	ElementType Word;
+	ElementType Word = NULL;
 	char document[5 * MAX_LENGTH];
 	strcpy(document, argv[0]);
 	for (int i=strlen(document) - 1; i >= 0; i--)
@@ -69,19 +65,19 @@ int main(int argc, char const *argv[])
 		FatalError("Can not open the file!\n");
 	while (!feof(fp))
 	{
-		Word = GetAWord(fp);
-		if (NULL != Word)
+		if (GetAWord(fp, &Word))
 		{
 			wordcount++;
-			printf("%s\n", Word);
-			Insert(H, Word);
+			debug(printf("%s\n", Word));
+			if (wordcount % 5 == 0) Insert(H, Word);
 		}
 	}
 	fclose(fp);
 	printf("Valid words count: %d\n", wordcount);
 	for (int i=0;i<H->TableSize;i++)
 	{
-		printf("%s\n", H->TheLists[i]->Element);
+		if (NULL != H->TheLists[i])
+			printf("%d,%p\n", i, H->TheLists[i]);
 	}
 	DestroyTable(H);
 	return 0;
