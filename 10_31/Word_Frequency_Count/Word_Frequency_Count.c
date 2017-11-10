@@ -5,7 +5,7 @@
 #include <String.h>
 #include "HashTable.h"
 
-#define _DEBUG
+// #define _DEBUG
 #ifdef _DEBUG
 #define debug(code) code
 #else
@@ -13,19 +13,12 @@
 #endif
 
 
-int GetAWord(FILE * fp, ElementType * Word)
+int GetAWord(FILE * fp, ElementType * Word) // Not valid -> 0; Valid -> 1
 {
 	char Buff[MAX_LENGTH];
 	char Temp[MAX_LENGTH];
 	int Counter = 0;
-	while (!feof(fp))
-	{
-		fscanf(fp, "%s", Buff);
-		if (strlen(Buff) == 1 && Buff[0] == ' ')
-			continue;
-		else
-			break;
-	}
+	fscanf(fp, "%s", Buff);
 	if (strlen(Buff) == 1 && Buff[0] == ' ')
 		return 0;
 	for (int i=0; i < strlen(Buff); i++)
@@ -45,10 +38,11 @@ int GetAWord(FILE * fp, ElementType * Word)
 
 int main(int argc, char const *argv[])
 {
-	int TableSize = 5000;
+	int TableSize = 3000;
 	int wordcount = 0;
 	HashTable H;
 	ElementType Word = NULL;
+
 	char document[5 * MAX_LENGTH];
 	strcpy(document, argv[0]);
 	for (int i=strlen(document) - 1; i >= 0; i--)
@@ -58,27 +52,33 @@ int main(int argc, char const *argv[])
 		document[i] = '\0';
 	}
 	strcat(document, "source.txt");
+	// Get the absolute path of the source document
+
 	FILE * fp;
 	H = InitializeTable(TableSize);
+
 	debug(printf("%s\n", document));
+
 	if (NULL == (fp = fopen(document,"r")))
 		FatalError("Can not open the file!\n");
+
 	while (!feof(fp))
 	{
 		if (GetAWord(fp, &Word))
 		{
 			wordcount++;
+
 			debug(printf("%s\n", Word));
+
 			Insert(H, Word);
 		}
 	}
+
 	fclose(fp);
+	printf("%s\t%s\n", "Frequency", "Word");
+	printf("-----------------------------\n");
+	Show(H);
 	printf("Valid words count: %d\n", wordcount);
-	for (int i=0;i<H->TableSize;i++)
-	{
-		if (NULL != H->TheLists[i])
-			printf("%d,%p\n", i, H->TheLists[i]);
-	}
 	DestroyTable(H);
 	return 0;
 }

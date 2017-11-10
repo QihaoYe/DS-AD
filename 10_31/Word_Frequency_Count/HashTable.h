@@ -7,6 +7,7 @@
 #define Error(code) fprintf(stderr, code)
 #define MinTableSize 2000
 #define MAX_LENGTH 64
+#define MAX_SIZE 30000
 #define ElementType char *
 
 
@@ -37,6 +38,8 @@ int Hash(int TableSize, ElementType Word);
 HashTable InitializeTable(int TableSize);
 Position Find(HashTable H, ElementType Word);
 void Insert(HashTable H, ElementType Word);
+void quick_process(List * A, int p, int q);
+void Show(HashTable H);
 void destroy(List * head);
 void DestroyTable(HashTable H);
 

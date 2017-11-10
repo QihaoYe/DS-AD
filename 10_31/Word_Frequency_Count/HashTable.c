@@ -4,7 +4,7 @@
 #include "HashTable.h"
 
 
-int NotPrime(int N)
+int NotPrime(int N) // Not prime -> 1; Prime -> 0
 {
 	if (N == 2 || N == 3)
 		return 0;
@@ -30,12 +30,9 @@ int Hash(int TableSize, ElementType Word)
 	int shift = 0;
 	unsigned long long value = 0;
 	while (*Word != '\0')
-	{
-		value += *Word << shift;
-		shift += 1;
-		Word++;
-	}
-	return (int)value % TableSize;
+		value += *(Word++) << shift++;
+	return abs((int)value % TableSize);
+	// In case out of boundary
 }
 
 
@@ -122,6 +119,52 @@ void Insert(HashTable H, ElementType Word)
 }
 
 
+void quick_process(List * A, int p, int q)
+{
+	if (p >= q) return;
+	int index = p;
+	List* i = A + p;
+	List key = *(A + p);
+	List* sentinel = A + q;
+	List temp;
+	while (i++ != sentinel)
+	{
+		if ((*i)->Frequency >= key->Frequency)
+		{
+			temp = *i;
+			*i = *(A + ++index);
+			*(A + index) = temp;
+		}
+	}
+	*(A + p) = *(A + index);
+	*(A + index) = key;
+	quick_process(A, p, index - 1);
+	quick_process(A, index + 1, q);
+}
+
+
+void Show(HashTable H)
+{
+	int index = 0;
+	List Node;
+	List array[MAX_SIZE];
+	for (int i=0; i < H->TableSize; i++)
+	{
+		if (NULL != (Node = H->TheLists[i]))
+			while (NULL != Node)
+			{
+				array[index++] = Node;
+				Node = Node->Next;
+			}
+	}
+	quick_process(array, 0, index - 1);
+	// Order the words by their frequency
+	// Large -> Small
+	for (int i=0; i < index; i++)
+		printf("%d\t\t%s\n", array[i]->Frequency, array[i]->Element);
+}
+
+
 void destroy(List * head)
 {
 	if (NULL == *head || NULL == head) return;
@@ -142,6 +185,3 @@ void DestroyTable(HashTable H)
 		destroy(&H->TheLists[i]);
 	free(H);
 }
-
-
-
