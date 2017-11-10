@@ -32,7 +32,7 @@ int Hash(int TableSize, ElementType Word)
 	while (*Word != '\0')
 	{
 		value += *Word << shift;
-		shift += 5;
+		shift += 1;
 		Word++;
 	}
 	return (int)value % TableSize;

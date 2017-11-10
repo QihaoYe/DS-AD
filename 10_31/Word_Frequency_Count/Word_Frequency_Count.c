@@ -45,7 +45,7 @@ int GetAWord(FILE * fp, ElementType * Word)
 
 int main(int argc, char const *argv[])
 {
-	int TableSize = 3000;
+	int TableSize = 5000;
 	int wordcount = 0;
 	HashTable H;
 	ElementType Word = NULL;
@@ -69,7 +69,7 @@ int main(int argc, char const *argv[])
 		{
 			wordcount++;
 			debug(printf("%s\n", Word));
-			if (wordcount % 5 == 0) Insert(H, Word);
+			Insert(H, Word);
 		}
 	}
 	fclose(fp);
