@@ -1,0 +1,4 @@
+folderpath=$(cd `dirname $0`; pwd)
+cd $folderpath
+make
+make clean
