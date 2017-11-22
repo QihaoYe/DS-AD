@@ -8,16 +8,18 @@ int cal_priority(char operation)
 	switch (operation)
 	{
 		case '+':
-		case '-':return 1;break;
+		case '-':return 1;
 		case '*':
-		case '/':return 2;break;
-		default:return -1;break;
+		case '/':return 2;
+		default:return -1;
 	}
 }
 
 
+
+
+
 int main(int argc, char const *argv[])
 {
-	
 	return 0;
 }
