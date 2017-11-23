@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "stack_char.h"
+#include "stack_float.h"
 
 
 int cal_priority(char operation)
@@ -16,10 +18,8 @@ int cal_priority(char operation)
 }
 
 
-
-
-
 int main(int argc, char const *argv[])
 {
+	
 	return 0;
 }
