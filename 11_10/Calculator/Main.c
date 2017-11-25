@@ -20,6 +20,8 @@ int cal_priority(char operation)
 
 int main(int argc, char const *argv[])
 {
-	
+	float a = 0.0;
+	scanf("%f", &a);
+	printf("%f", a);
 	return 0;
 }
