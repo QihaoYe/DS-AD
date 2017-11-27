@@ -37,6 +37,8 @@ void get_operation(char * operation)
         scanf("%c", operation);
     if (is_in(*operation, OPERATION, 6))
         return;
+    else if ('\n' == *operation)
+        *operation = 'E';
     else
     {
         fprintf(stderr, "Invalid operation detected!\n");
