@@ -1,4 +1,13 @@
 #include <stdio.h>
+#include <stdlib.h>
+#define ElementType int
+
+
+typedef struct Node
+{
+	ElementType key;
+	struct Node * next;
+}Node;
 
 
 void reverse(Node ** head)
@@ -73,3 +82,16 @@ Node * last_kth(Node * head, int k)
 	return q;
 }
 
+
+void delete(Node * p)
+{
+	if (NULL == p->next)
+	{
+		p = NULL;
+		return;
+	}
+	Node * q = p->next;
+	p->key = q->key;
+	p->next = q->next;
+	free(q);
+}
