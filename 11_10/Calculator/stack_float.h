@@ -1,7 +1,7 @@
-#ifdef __STACK_CHAR__
+#ifdef __STACK_FLOAT__
 #else
-#define __STACK_CHAR__
-#define maxsize 128
+#define __STACK_FLOAT__
+#include "initial_value.h"
 
 typedef struct
 {

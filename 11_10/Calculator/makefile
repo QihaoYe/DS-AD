@@ -2,8 +2,8 @@ CC=gcc
 CFLAGS=-Wall
 TARGET = Calculator
 SRCS = Main.c \
-		stack_char.c\
-		stack_float.c
+		stack_char.c \
+		stack_float.c \
 		
 OBJS = $(SRCS:.c=.o) 
 $(TARGET) : $(OBJS)
