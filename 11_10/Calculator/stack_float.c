@@ -28,14 +28,15 @@ int stack_float_full(stack_float *s)
 }
 
 
-void stack_float_push(stack_float *s,float operation)
+void stack_float_push(stack_float *s,float value)
 {
     if(stack_float_full(s))
     {
         fprintf(stderr, "Stack is full, push failed!\n");
         return;
     }
-    *((s->top)++) = operation;
+    *((s->top)++) = value;
+    s->stacksize++;
 }
 
 
@@ -46,7 +47,8 @@ void stack_float_pop(stack_float *s)
         fprintf(stderr, "Stack is null, pop failed!\n");
         return;
     }
-    --s->top;
+    s->top--;
+    s->stacksize--;
 }
 
 
@@ -55,7 +57,7 @@ float stack_float_top(stack_float *s)
     if(stack_float_null(s))
     {
         fprintf(stderr, "Stack is null, top failed!\n");
-        return '\0';
+        return 0.0;
     }
     return *(s->top-1);
 }
@@ -64,6 +66,5 @@ float stack_float_top(stack_float *s)
 void stack_float_destroy(stack_float *s)
 {
     free(s->base);
-    free(s);
 }
 

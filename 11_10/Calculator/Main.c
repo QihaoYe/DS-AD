@@ -1,14 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-//#include <string.h>
 #include "stack_char.h"
 #include "stack_float.h"
 
 #define is_in(sub, group, n) char_is_in(sub, group, 0, n)
 int state = 0;
 // 0->float, 1->operation
-stack_char * s_c;
-stack_float * s_f;
 
 
 int cal_priority(char operation)
@@ -19,7 +16,6 @@ int cal_priority(char operation)
 		case '-':return 1;
 		case '*':
 		case '/':return 2;
-//        case '^':return 3;
 		default:return -1;
 	}
 }
@@ -54,8 +50,9 @@ void get_float_char(char * value, const char * command, int * n)
             dot_num++;
             if (dot_num > 2)
             {
-//                fprintf(stderr, "Invalid value detected!\n");
+                fprintf(stderr, "Invalid value detected!\n");
                 *value = '?';
+                index = 1;
                 break;
             }
             value[index++] = temp;
@@ -67,6 +64,7 @@ void get_float_char(char * value, const char * command, int * n)
             (*n)++;
         }
     }
+    value[index] = '\0';
 }
 
 
@@ -76,7 +74,7 @@ void get_float(float * value, char * temp,const char * command, int * n)
     if ('?' == *temp)
         return;
     else
-        sscanf(temp, "%f", value);
+        *value = strtof(temp, NULL);
 }
 
 
@@ -87,85 +85,173 @@ void get_operation(char * operation, const char * command, int * n)
     if (is_in(*operation, OPERATIONS, 6))
         return;
     else if ('\n' == *operation)
-        *operation = 'E';
+        return;
     else
     {
-//        fprintf(stderr, "Invalid operation detected!\n");
+        fprintf(stderr, "Invalid operation detected!\n");
         *operation = '?';
     }
 }
 
 
-void set_stack(stack_char * s_c, stack_float * s_f)
+char get_next_char(const char * command, int * n)
 {
-    float value;
-    char operation;
-    while (1)
-    {
-        if (0 == state)
-        {
-            value = scanf("%f", &value);
-            stack_float_push(s_f, value);
-            state = 1;
-        }
-        else if (1 == state)
-        {
-            get_operation(&operation);
-            stack_char_push(s_c, operation);
-        }
-    }
+    while (' ' == *(command + *n))
+        (*n)++;
+    return *(command + *n);
 }
 
 void calculate(stack_char * s_c,
-               stack_float s_f,
+               stack_float * s_f,
                char * line,
                char * operation,
                char * temp,
                float * value,
                int *n)
 {
-    return;
+    char next = ' ';
+    char last = ' ';
+    float f1 = 0.0;
+    float f2 = 0.0;
+    while (1)
+    {
+        if (0 == state)
+        {
+            get_float(value, temp, line, n);
+            if ('?' == *temp)
+                break;
+            stack_float_push(s_f, *value);
+            state = 1;
+        }
+        else if (1 == state)
+        {
+            get_operation(operation, line, n);
+            (*n)++;
+            if (!stack_char_null(s_c))
+                last = stack_char_top(s_c);
+            if ('\n' == *operation)
+            {
+                while (!stack_char_null(s_c))
+                {
+                    last = stack_char_top(s_c);
+                    f2 = stack_float_top(s_f);
+                    stack_float_pop(s_f);
+                    if (stack_float_null(s_f))
+                    {
+                        fprintf(stderr, "Not a valid formula!\n");
+                        state = -1;
+                        break;
+                    }
+                    f1 = stack_float_top(s_f);
+                    stack_float_pop(s_f);
+                    switch (last) {
+                        case '+':
+                            stack_float_push(s_f, f1 + f2);
+                            break;
+                        case '-':
+                            stack_float_push(s_f, f1 - f2);
+                            break;
+                        case '*':
+                            stack_float_push(s_f, f1 * f2);
+                            break;
+                        case '/':
+                            stack_float_push(s_f, f1 / f2);
+                            break;
+                        default:
+                            break;
+                    }
+                    stack_char_pop(s_c);
+                }
+                state = 0;
+                if (1 == s_f->stacksize)
+                {
+                    printf("= %g\n", stack_float_top(s_f));
+                    stack_float_pop(s_f);
+                }
+                else
+                {
+                    stack_char_destroy(s_c);
+                    stack_float_destroy(s_f);
+                    stack_char_init(s_c);
+                    stack_float_init(s_f);
+                }
+                break;
+            }
+            if ('?' == *operation)
+                break;
+            if (stack_char_null(s_c) || cal_priority(last) < cal_priority(*operation))
+                stack_char_push(s_c, *operation);
+            else
+            {
+                while (cal_priority(last) >= cal_priority(*operation))
+                {
+                    f2 = stack_float_top(s_f);
+                    stack_float_pop(s_f);
+                    f1 = stack_float_top(s_f);
+                    stack_float_pop(s_f);
+                    switch (last)
+                    {
+                        case '+':
+                            stack_float_push(s_f, f1 + f2);
+                            break;
+                        case '-':
+                            stack_float_push(s_f, f1 - f2);
+                            break;
+                        case '*':
+                            stack_float_push(s_f, f1 * f2);
+                            break;
+                        case '/':
+                            stack_float_push(s_f, f1 / f2);
+                            break;
+                        default:
+                            break;
+                    }
+                    stack_char_pop(s_c);
+                    if (stack_char_null(s_c))
+                        break;
+                    else
+                        last = stack_char_top(s_c);
+                }
+                stack_char_push(s_c, *operation);
+            }
+            state = 2;
+        }
+        else if (2 == state)
+        {
+            next = get_next_char(line, n);
+            if (next < '9' && next > '0')
+                state = 0;
+            else
+                state = 1;
+        }
+    }
 }
 
 
 int main(int argc, char const *argv[])
 {
-//    char b = ' ';
+    stack_char * s_c = (stack_char *)malloc(sizeof(stack_char));
+    stack_float * s_f = (stack_float *)malloc(sizeof(stack_float));
+    char * line = (char *)malloc(MAX_BUFF * sizeof(char));
+    char * operation = (char *)malloc(sizeof(char));
+    char * temp = (char *)malloc(MAX_FLOAT_SIZE * sizeof(char));
+    float value = 0.0;
     int n = 0;
-    float num = 0.0;
-    char *buff = (char *)malloc(1000 * sizeof(char));
-//    while(NULL != fgets(buff, 1000, stdin))
-//    {
-//        if (buff[0] == '\n')
-//            break;
-//        n = 0;
-//        while ('E' != b)
-//        {
-//            scanf(buff + n, "%f", &num);
-//            get_operation(&b, buff, &n);
-//            n++;
-//            printf("%c\n", b);
-//            printf("%f\n", num);
-//        }
-//    }
-    buff = "213.2+234.5";
-    char * t = (char *)malloc(MAX_FLOAT_SIZE * sizeof(char));
-    get_float(&num, t, buff, &n);
-    printf("%g\n", num);
-    printf("%s\n", t);
-
-
-//    free(buff);
-
-//    for (int i=0;i<3;i++)
-//    {
-//        get_operation(&b);
-//        printf("%c\n", b);
-//    }
-//	float a = 0.0;
-//	scanf("%f", &a);
-//	printf("%.5f\n", a);
-//    scanf("%f", &a);
-//    printf("%.5f\n", a);
-	return 0;
+    stack_char_init(s_c);
+    stack_float_init(s_f);
+    while (NULL != fgets(line, MAX_BUFF, stdin))
+    {
+        if ('\n' == *line)
+            break;
+        n = 0;
+        calculate(s_c, s_f, line, operation,temp, &value, &n);
+    }
+    stack_char_destroy(s_c);
+    stack_float_destroy(s_f);
+    free(s_c);
+    free(s_f);
+    free(line);
+    free(operation);
+    free(temp);
+    return 0;
 }

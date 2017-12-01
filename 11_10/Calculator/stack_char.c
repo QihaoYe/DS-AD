@@ -36,6 +36,7 @@ void stack_char_push(stack_char *s,char operation)
         return;
     }
     *((s->top)++) = operation;
+    s->stacksize++;
 }
 
 
@@ -46,7 +47,8 @@ void stack_char_pop(stack_char *s)
         fprintf(stderr, "Stack is null, pop failed!\n");
         return;
     }
-    --s->top;
+    s->top--;
+    s->stacksize--;
 }
 
 
@@ -64,6 +66,5 @@ char stack_char_top(stack_char *s)
 void stack_char_destroy(stack_char *s)
 {
     free(s->base);
-    free(s);
 }
 
