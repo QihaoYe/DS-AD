@@ -13,6 +13,7 @@ void stack_char_init(stack_char *s)
     }
     s->top = s->base;
     s->stacksize = 0;
+    stack_char_push(s, '(');
 }
 
 

@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "stack_char.h"
 #include "stack_float.h"
 
 #define is_in(sub, group, n) char_is_in(sub, group, 0, n)
 int state = 0;
-// 0->float, 1->operation
+// 0->value, 1->operation
+// -1->error, 2->to be determined, 3->parenthesis
 
 
 int cal_priority(char operation)
@@ -16,12 +18,13 @@ int cal_priority(char operation)
 		case '-':return 1;
 		case '*':
 		case '/':return 2;
+        case '(':return 100;
 		default:return -1;
 	}
 }
 
 
-int char_is_in(char sub, char * group,int start, int length)
+int char_is_in(char sub, const char * group,int start, int length)
 {
     for (int i=start; i < length; i++)
         if (sub == group[i])
@@ -35,7 +38,7 @@ void get_float_char(char * value, const char * command, int * n)
     int dot_num = 0;
     int index = 0;
     char temp;
-    while ((*(command + *n) < '9' && *(command + *n) > '0')
+    while ((*(command + *n) <= '9' && *(command + *n) >= '0')
            || '.' == *(command + *n)
            || ' ' == *(command + *n))
     {
@@ -48,7 +51,7 @@ void get_float_char(char * value, const char * command, int * n)
         if ('.' == temp)
         {
             dot_num++;
-            if (dot_num > 2)
+            if (dot_num > 1)
             {
                 fprintf(stderr, "Invalid value detected!\n");
                 *value = '?';
@@ -101,6 +104,7 @@ char get_next_char(const char * command, int * n)
     return *(command + *n);
 }
 
+
 void calculate(stack_char * s_c,
                stack_float * s_f,
                char * line,
@@ -109,10 +113,10 @@ void calculate(stack_char * s_c,
                float * value,
                int *n)
 {
-    char next = ' ';
+    char next;
     char last = ' ';
-    float f1 = 0.0;
-    float f2 = 0.0;
+    float f1;
+    float f2;
     while (1)
     {
         if (0 == state)
@@ -134,6 +138,12 @@ void calculate(stack_char * s_c,
                 while (!stack_char_null(s_c))
                 {
                     last = stack_char_top(s_c);
+                    if ('(' == last || ')' == last)
+                    {
+                        fprintf(stderr, "Not a valid formula!\n");
+                        state = -1;
+                        break;
+                    }
                     f2 = stack_float_top(s_f);
                     stack_float_pop(s_f);
                     if (stack_float_null(s_f))
@@ -162,31 +172,44 @@ void calculate(stack_char * s_c,
                     }
                     stack_char_pop(s_c);
                 }
-                state = 0;
-                if (1 == s_f->stacksize)
+                if (1 == s_f->stacksize && 1 == state)
                 {
                     printf("= %g\n", stack_float_top(s_f));
                     stack_float_pop(s_f);
                 }
-                else
-                {
-                    stack_char_destroy(s_c);
-                    stack_float_destroy(s_f);
-                    stack_char_init(s_c);
-                    stack_float_init(s_f);
-                }
                 break;
             }
             if ('?' == *operation)
+            {
+                state = 0;
                 break;
+            }
             if (stack_char_null(s_c) || cal_priority(last) < cal_priority(*operation))
                 stack_char_push(s_c, *operation);
             else
             {
-                while (cal_priority(last) >= cal_priority(*operation))
+                while (!stack_char_null(s_c) && cal_priority(last) >= cal_priority(*operation))
                 {
+                    if ('(' == last)
+                    {
+                        if (')' == *operation)
+                            state = 3;
+                        break;
+                    }
+                    if (')' == last)
+                    {
+                        fprintf(stderr, "Not a valid formula!\n");
+                        state = -1;
+                        break;
+                    }
                     f2 = stack_float_top(s_f);
                     stack_float_pop(s_f);
+                    if (stack_float_null(s_f))
+                    {
+                        fprintf(stderr, "Not a valid formula!\n");
+                        state = -1;
+                        break;
+                    }
                     f1 = stack_float_top(s_f);
                     stack_float_pop(s_f);
                     switch (last)
@@ -212,17 +235,26 @@ void calculate(stack_char * s_c,
                     else
                         last = stack_char_top(s_c);
                 }
-                stack_char_push(s_c, *operation);
+                if (-1 == state)
+                    break;
+                else if (3 == state)
+                    stack_char_pop(s_c);
+                else
+                    stack_char_push(s_c, *operation);
             }
             state = 2;
         }
         else if (2 == state)
         {
             next = get_next_char(line, n);
-            if (next < '9' && next > '0')
+            if (next <= '9' && next >= '0')
                 state = 0;
             else
+            {
                 state = 1;
+                if (!stack_char_null(s_c) && '(' == stack_char_top(s_c) && '-' == next)
+                    stack_float_push(s_f, 0);
+            }
         }
     }
 }
@@ -230,6 +262,12 @@ void calculate(stack_char * s_c,
 
 int main(int argc, char const *argv[])
 {
+    printf("╭---------------------------------------╮\n");
+    printf("|           SIMPLE CALCULATOR           |\n");
+    printf("|             float VERSION             |\n");
+    printf("|            +-*/()supported            |\n");
+    printf("| Input nothing but `Enter` key to quit |\n");
+    printf("╰---------------------------------------╯\n");
     stack_char * s_c = (stack_char *)malloc(sizeof(stack_char));
     stack_float * s_f = (stack_float *)malloc(sizeof(stack_float));
     char * line = (char *)malloc(MAX_BUFF * sizeof(char));
@@ -243,8 +281,15 @@ int main(int argc, char const *argv[])
     {
         if ('\n' == *line)
             break;
+        line[strlen(line) - 1] = ')';
+        line[strlen(line)] = '\n';
         n = 0;
+        state = 2;
         calculate(s_c, s_f, line, operation,temp, &value, &n);
+        stack_char_destroy(s_c);
+        stack_float_destroy(s_f);
+        stack_char_init(s_c);
+        stack_float_init(s_f);
     }
     stack_char_destroy(s_c);
     stack_float_destroy(s_f);
