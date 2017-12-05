@@ -32,6 +32,8 @@ test/test002
 11_21/List_Reverse
 11_21/Graph.cpp
 11_10/Calculator/Calculator
+[0-9]*/cmake-build-debug/
 [0-9]*/*/cmake-build-debug/
 *.iml
 *.xml
+*.idea
