@@ -37,3 +37,7 @@ test/test002
 *.iml
 *.xml
 *.idea
+*.dot
+*.png
+11_24/Make_Any.sh~
+11_24/Eulerian_Circuit
