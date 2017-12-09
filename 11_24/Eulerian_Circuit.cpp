@@ -37,7 +37,7 @@ int main(int argc, char const *argv[])
 	for (i = 0; i < M; i++)
 	{
 		cin >> node_1 >> node_2;
-		father[node_2] = get(node_1);
+		father[get(node_2)] = get(node_1);
 		node_num[node_1]++;
 		node_num[node_2]++;
 	}
