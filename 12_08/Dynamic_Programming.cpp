@@ -1,6 +1,7 @@
 #include <iostream>
 // source:http://blog.csdn.net/u010607947/article/details/78326590
 
+using namespace std;
 
 // // Method_1
 // int main(int argc, char const *argv[])
@@ -69,34 +70,65 @@
 // }
 
 // Method_3
+
+int maxSum(int * A, int n)
+{
+	int start[n];
+	int all[n];
+	start[n - 1] = A[n - 1];
+	all[n - 1] = A[n - 1];
+	for (int i = n - 2; i >= 0; --i)
+	{
+		start[i] = max(A[i], A[i] + start[i + 1]);
+		all[i] = max(start[i], all[i + 1]);
+	}
+	return all[0];
+}
+
+int MaxSum(int * A, int n)
+{
+	int nStart = A[n - 1];
+	int nAll = A[n - 1];
+	for (int i = n - 2; i >= 0; --i)
+	{
+		if (nStart < 0)
+			nStart = 0;
+		nStart += A[i];
+		if (nStart > nAll)
+			nAll = nStart;
+	}
+	return nAll;
+}
+
 int main(int argc, char const *argv[])
 {
 	int a[] = {0, 3, -4, 5, 1, 3, -7, 2, 1, -2, 3};
 	int n = 10;
-	int max = INT_MIN;
-	int b[n + 1];
-	int start[n + 1];
-	int end = 0;
-	memset(b, 0, n + 1);
-	memset(start, 0, n + 1);
-	for (int i = 1; i <= n; ++i)
-	{
-		if (b[i - 1] > 0)
-		{
-			b[i] = b[i - 1] + a[i];
-			start[i] = start[i - 1];
-		}
-		else
-		{
-			b[i] = a[i];
-			start[i] = i;
-		}
-		if (b[i] > max)
-		{
-			max = b[i];
-			end = i;
-		}
-	}
-	printf("start: %d\nend  : %d\nmax  : %d\n", start[end], end, max);
-	return 0;
+	cout << MaxSum(a, n) << endl;
+	// int max = INT_MIN;
+	// int b[n + 1];
+	// int start[n + 1];
+	// int end = 0;
+	// memset(b, 0, n + 1);
+	// memset(start, 0, n + 1);
+	// for (int i = 1; i <= n; ++i)
+	// {
+	// 	if (b[i - 1] > 0)
+	// 	{
+	// 		b[i] = b[i - 1] + a[i];
+	// 		start[i] = start[i - 1];
+	// 	}
+	// 	else
+	// 	{
+	// 		b[i] = a[i];
+	// 		start[i] = i;
+	// 	}
+	// 	if (b[i] > max)
+	// 	{
+	// 		max = b[i];
+	// 		end = i;
+	// 	}
+	// }
+	// printf("start: %d\nend  : %d\nmax  : %d\n", start[end], end, max);
+	// return 0;
 }
