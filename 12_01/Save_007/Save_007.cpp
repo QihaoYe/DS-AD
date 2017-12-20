@@ -64,10 +64,11 @@ int main(int argc, char const *argv[])
     argv[0] = "/Users/apple/Documents/Data_Structures/12_01/12";
     char filename[] = "points.txt";
     read_in(&fp, argv[0], filename);
-    point points[POINT_NUMBER];
-    int adjacency_matrix[POINT_NUMBER][POINT_NUMBER];
+    point points[POINT_NUMBER + 1];
+    int adjacency_matrix[POINT_NUMBER + 1][POINT_NUMBER + 1];
     memset(adjacency_matrix, 0, sizeof(adjacency_matrix));
-    int index = 0;
+    points[0] = point(0, 0);
+    int index = 1;
     int LEAP_SQUARE = LEAP * LEAP;
     while (!feof(fp))
     {
@@ -79,17 +80,17 @@ int main(int argc, char const *argv[])
         points[index].y = y;
         index++;
     }
-    for (int i = 0; i < POINT_NUMBER; i++)
+    for (int i = 0; i <= POINT_NUMBER; i++)
     {
-        for (int j = i + 1; j < POINT_NUMBER; j++)
+        for (int j = i + 1; j <= POINT_NUMBER; j++)
             if (distance_square(points[i], points[j]) <= LEAP_SQUARE)
                 adjacency_matrix[i][j] = adjacency_matrix[j][i] = 1;
         if (is_near_boundary(points[i]))
             adjacency_matrix[i][i] = 2;
     }
-    for (int i = 0; i < POINT_NUMBER; i++)
+    for (int i = 0; i <= POINT_NUMBER; i++)
     {
-        for (int j = 0; j < POINT_NUMBER; j++)
+        for (int j = 0; j <= POINT_NUMBER; j++)
         {
             cout << adjacency_matrix[i][j] << " ";
         }

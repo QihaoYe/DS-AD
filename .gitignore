@@ -29,6 +29,7 @@ test/test002
 10_31/Word_Frequency_Count/Word_Frequency_Count
 11_14/Bit_Count
 11_10/Hash_Phone/Hash_Phone
+!11_10/Hash_Phone/Source_Generator.py
 11_21/List_Reverse
 11_21/Graph.cpp
 11_10/Calculator/Calculator
@@ -47,5 +48,8 @@ test/test002
 12_01/Group_Categorizer
 12_19/king_of_watering
 12_19/gcd
-12_01/Text_Similarity
-12_01/Save_007
+12_01/Save_007/Save_007
+12_01/Text_Similarity/Text_Similarity
+!12_01/Save_007/Sprinkle_Points.py
+!12_01/Save_007/points.png
+!12_01/Save_007/points.txt
