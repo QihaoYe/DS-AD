@@ -61,7 +61,7 @@ void read_in(FILE ** fp, const char * PATH, char * filename)
 int main(int argc, char const *argv[])
 {
 	FILE * fp;
-    argv[0] = "/Users/apple/Documents/Data_Structures/12_01/12";
+    argv[0] = "/Users/apple/Documents/Data_Structures/12_01/Save_007/12";
     char filename[] = "points.txt";
     read_in(&fp, argv[0], filename);
     point points[POINT_NUMBER + 1];
