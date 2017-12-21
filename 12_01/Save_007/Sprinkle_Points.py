@@ -12,7 +12,7 @@ from matplotlib.ticker import MultipleLocator
 
 PATH = sys.path[0]
 BOUNDARY = 50
-N = 300
+N = 500
 result = [[0, 0]]
 
 

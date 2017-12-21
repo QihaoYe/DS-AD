@@ -4,7 +4,7 @@
 #define BOUNDARY_X 50
 #define BOUNDARY_Y 50
 #define LEAP 5
-#define POINT_NUMBER 300
+#define POINT_NUMBER 500
 using namespace std;
 
 
@@ -12,15 +12,18 @@ typedef struct point
 {
     int x;
     int y;
+    int previous;
     point()
     {
         this->x = 0;
         this->y = 0;
+        this->previous = -1;
     }
     point(int x, int y)
     {
         this->x = x;
         this->y = y;
+        this->previous = -1;
     }
 
 }point;
@@ -58,14 +61,16 @@ void read_in(FILE ** fp, const char * PATH, char * filename)
 // Use the absolute path of the source document
 
 
+void BFS(int point_num);
+point points[POINT_NUMBER + 1];
+int adjacency_matrix[POINT_NUMBER + 1][POINT_NUMBER + 1];
+
+
 int main(int argc, char const *argv[])
 {
 	FILE * fp;
-    argv[0] = "/Users/apple/Documents/Data_Structures/12_01/Save_007/12";
     char filename[] = "points.txt";
     read_in(&fp, argv[0], filename);
-    point points[POINT_NUMBER + 1];
-    int adjacency_matrix[POINT_NUMBER + 1][POINT_NUMBER + 1];
     memset(adjacency_matrix, 0, sizeof(adjacency_matrix));
     points[0] = point(0, 0);
     int index = 1;
@@ -88,54 +93,46 @@ int main(int argc, char const *argv[])
         if (is_near_boundary(points[i]))
             adjacency_matrix[i][i] = 2;
     }
-    for (int i = 0; i <= POINT_NUMBER; i++)
-    {
-        for (int j = 0; j <= POINT_NUMBER; j++)
-        {
-            cout << adjacency_matrix[i][j] << " ";
-        }
-        cout << endl;
-    }
+    BFS(0);
 	return 0;
 }
 
-
-//void DFS(int V)
-//{
-//    Visited[V] = true;
-//    printf("%d ", V);
-//    for (int i = 0; i < n; i++)
-//    {
-//        if (G[V][i] && !Visited[i])
-//            DFS(i);
-//    }
-//}
-//
-//void BFS(int V)
-//{
-//    const int MAX_SIZE = 100;
-//    int Queue[MAX_SIZE];
-//    int first = -1, last = -1;
-//
-//    Queue[++last] = V;      //入队
-//    Visited[V] = true;
-//    while (first < last)    //当队不为空时
-//    {
-//        int F = Queue[++first];     //出队
-//        printf("%d ", F);
-//        for (int i = 0; i < n; i++)
-//        {
-//            if (G[F][i] && !Visited[i])
-//            {
-//                Queue[++last] = i;      //入队
-//                Visited[i] = true;
-//            }
-//        }
-//    }
-//}
-//
-//void InitVisit()
-//{
-//    for (int i = 0; i < N; i++)
-//        Visited[i] = false;
-//}
+void BFS(const int point_num)
+{
+    int queue[POINT_NUMBER + 1];
+    int visited[POINT_NUMBER + 1];
+    memset(visited, 0, sizeof(visited));
+    int first = -1, last = -1;
+    int result[POINT_NUMBER + 1];
+    // Store the path
+    int index = -1;
+    queue[++last] = point_num;
+    visited[point_num] = 1;
+    while (first < last)
+    {
+        int F = queue[++first];
+        if (adjacency_matrix[F][F] == 2)
+        {
+            point temp = points[F];
+            result[++index] = F;
+            while (temp.previous != -1)
+            {
+                result[++index] = temp.previous;
+                temp = points[temp.previous];
+            }
+            break;
+        }
+        for (int i = 0; i <= POINT_NUMBER; i++)
+        {
+            if (adjacency_matrix[F][i] && !visited[i])
+            {
+                queue[++last] = i;
+                visited[i] = 1;
+                points[i].previous = F;
+            }
+        }
+    }
+    index++;
+    while (index-- > 0)
+        cout << points[result[index]].x << " " << points[result[index]].y << endl;
+}

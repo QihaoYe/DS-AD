@@ -1,0 +1,10 @@
+folderpath=$(cd `dirname $0`; pwd)
+cd $folderpath
+python3 Sprinkle_Points.py
+
+if [ -f path.txt ]; then
+	rm path.txt
+fi
+$folderpath/Save_007 >> path.txt
+
+python3 Draw_Path.py
