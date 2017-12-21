@@ -2,6 +2,7 @@ folderpath=$(cd `dirname $0`; pwd)
 cd $folderpath
 python3 Sprinkle_Points.py
 
+g++ -o Save_007 Save_007.cpp
 if [ -f path.txt ]; then
 	rm path.txt
 fi
