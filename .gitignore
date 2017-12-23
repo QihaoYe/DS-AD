@@ -35,6 +35,7 @@ test/test002
 11_10/Calculator/Calculator
 [0-9]*/cmake-build-debug/
 [0-9]*/*/cmake-build-debug/
+project/cmake-build-debug/
 *.iml
 *.xml
 *.idea
