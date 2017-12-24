@@ -2,11 +2,30 @@
 #include <fstream>
 #include <regex.h>
 #define MAX_LENGTH 64
+#define MAX_SIZE 25000000
+#define INFO_INTERVAL 2000000
 #define FatalError(code) fprintf(stderr, code)
-char FILENAME[] = "massive_float/data.txt";
+char FILENAME[] = "massive_float/clean_data.txt";
+int STEP1_STAGE = 0;
+char PATIENT_INFO[] = "-\\|/";
+int PATIENT_COUNTER = 0;
 
 
 using namespace std;
+
+
+void next_patient_counter(int * patient_counter)
+{
+    *(patient_counter) = (*(patient_counter) + 1) % 4;
+}
+
+
+void print_patient_info()
+{
+    fprintf(stderr, "\b \b");
+    fprintf(stderr, "%c", PATIENT_INFO[PATIENT_COUNTER]);
+    next_patient_counter(&PATIENT_COUNTER);
+}
 
 
 void get_absolute_path(char document[])
@@ -24,14 +43,25 @@ void read_in(FILE ** fp, const char * PATH, const char * filename)
 {
     char document[5 * MAX_LENGTH];
     strcpy(document, PATH);
-    get_absolute_path(document);
     strcat(document, filename);
     if (NULL == (*fp = fopen(document,"r")))
         FatalError("Can not open the file!\n");
 }
-// Use the absolute path of the source document
 
 
+void write_in(FILE ** fp, const char * PATH, const char * filename)
+{
+    char document[5 * MAX_LENGTH];
+    strcpy(document, PATH);
+    strcat(document, filename);
+    if (NULL == (*fp = fopen(document,"w")))
+        FatalError("Can not open the file!\n");
+}
+
+
+/*
+ * state : abandoned
+ * reason: too slow
 void merge(double A[], double temp[], int left, int mid, int right)
 {
     int i = left;
@@ -58,6 +88,7 @@ void merge_sort(double A[], double temp[], int left, int right)
         merge(A, temp, left, mid, right);
     }
 }
+*/
 
 
 int is_dirty_data(const char buff[])
@@ -76,13 +107,10 @@ int is_dirty_data(const char buff[])
 
 void get_clean_data(FILE * data, const char * PATH, const char * filename)
 {
-    char document[5 * MAX_LENGTH];
+    FILE * out;
+    write_in(&out, PATH, filename);
     char buff[MAX_LENGTH];
     int counter = 0;
-    strcpy(document, PATH);
-    get_absolute_path(document);
-    strcat(document, filename);
-    ofstream out(document);
     while (fgets(buff, MAX_LENGTH, data))
     {
         double x;
@@ -98,17 +126,17 @@ void get_clean_data(FILE * data, const char * PATH, const char * filename)
         else
         {
             counter++;
-            out << x << endl;
+            fprintf(out, "%lG\n", x);
         }
         if ((counter) % 100000 == 0)
             cout << counter << endl;
     }
-    out.close();
     cout << counter << endl;
 }
 
+
 /*
- * abandoned
+ * state : abandoned
  * reason: too slow
 #include <regex>
 int is_dirty_data(const char buff[])
@@ -122,24 +150,68 @@ int is_dirty_data(const char buff[])
 }
 */
 
-int main(int argc, char const *argv[])
+
+int step_1(FILE * data, const char * PATH, const char * filename)
 {
-    FILE * fp;
-	argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
-    read_in(&fp, argv[0], FILENAME);
-    get_clean_data(fp, argv[0], "output/clean_data.txt");
-	return 0;
+    STEP1_STAGE++;
+    cout << "Running  [STEP_1: " << "STAGE_" << STEP1_STAGE << "]" << endl;
+    FILE * out;
+    write_in(&out, PATH, filename);
+    int counter = 0;
+    double * sorter = new double[MAX_SIZE];
+    int flag = 0;
+    cout << "Reading in..." << endl;
+    while (!feof(data))
+    {
+        double x;
+        flag = fscanf(data, "%lf\n", &x);
+        if (flag != 1)
+            break;
+        sorter[counter++] = x;
+        if (MAX_SIZE == counter)
+        {
+            flag = 2;
+            break;
+        }
+        if (counter % INFO_INTERVAL == 0)
+            print_patient_info();
+    }
+    cout << endl << "Sorting..." << endl;
+    sort(sorter, sorter + MAX_SIZE);
+    cout << "Storing..." << endl;
+    for (int _ = 0; _ < MAX_SIZE; _++)
+    {
+        fprintf(out, "%lG\n", sorter[_]);
+        if (_ % INFO_INTERVAL == 0)
+            print_patient_info();
+    }
+    cout << endl << "Finished " << "[STEP_1: " << "STAGE_" << STEP1_STAGE << "]" << endl;
+    delete[] sorter;
+    return flag;
 }
 
-//int main(int argc, char const *argv[])
-//{
-//    ofstream out("/Users/apple/Documents/Data_Structures/project/output/out.txt");
-//    if (out.is_open())
-//    {
-//        out << "This is a line.\n";
-//        out << "This is another line.\n";
-//        cout << "ahas" << endl;
-//        out.close();
-//    }
-//    return 0;
-//}
+
+//    get_clean_data(fp, PATH, "output/clean_data.txt");
+int main(int argc, char const *argv[])
+{
+    time_t start, end;
+    start = clock();
+
+
+    FILE * fp;
+	argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
+    char PATH[5 * MAX_LENGTH];
+    strcpy(PATH, argv[0]);
+    get_absolute_path(PATH);
+
+    read_in(&fp, PATH, FILENAME);
+
+    step_1(fp, PATH, "output/001.txt");
+    step_1(fp, PATH, "output/002.txt");
+//    remove("/Users/apple/Documents/Data_Structures/project/output/001.txt");
+
+
+    end = clock();
+    cout << (double)((end - start) / CLOCKS_PER_SEC) << endl;
+	return 0;
+}
