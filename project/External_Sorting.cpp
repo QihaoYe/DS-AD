@@ -1,6 +1,5 @@
 #include <iostream>
 #include <queue>
-#include <string>
 #include <regex.h>
 #define MAX_LENGTH 64
 #define MAX_SIZE 25000000
@@ -251,10 +250,7 @@ void step_2(int file_number_1, int file_number_2, const char * PATH, const char 
         fprintf(out, "%lG\n", x1);
         counter++;
         if (counter % INFO_INTERVAL == 0)
-        {
-            fprintf(stderr, "ttt1\n");
             print_patient_info();
-        }
     }
     fclose(data_1);
     while (!feof(data_2))
@@ -263,10 +259,7 @@ void step_2(int file_number_1, int file_number_2, const char * PATH, const char 
         fprintf(out, "%lG\n", x2);
         counter++;
         if (counter % INFO_INTERVAL == 0)
-        {
-            fprintf(stderr, "ttt2\n");
             print_patient_info();
-        }
     }
     fclose(data_2);
     fclose(out);
