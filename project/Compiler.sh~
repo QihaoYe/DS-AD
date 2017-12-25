@@ -1,0 +1,3 @@
+folderpath=$(cd `dirname $0`; pwd)
+cd $folderpath
+g++ -o External_Sorting External_Sorting.cpp

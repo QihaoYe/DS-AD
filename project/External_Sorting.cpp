@@ -1,17 +1,20 @@
 #include <iostream>
-#include <fstream>
+#include <queue>
+#include <string>
 #include <regex.h>
 #define MAX_LENGTH 64
 #define MAX_SIZE 25000000
 #define INFO_INTERVAL 2000000
 #define FatalError(code) fprintf(stderr, code)
+using namespace std;
 char FILENAME[] = "massive_float/clean_data.txt";
+char prefix[] = "output/";
 int STEP1_STAGE = 0;
+int STEP2_STAGE = 0;
+int TOTAL_STAGE = 0;
 char PATIENT_INFO[] = "-\\|/";
 int PATIENT_COUNTER = 0;
-
-
-using namespace std;
+queue<int> external_files;
 
 
 void next_patient_counter(int * patient_counter)
@@ -120,7 +123,7 @@ void get_clean_data(FILE * data, const char * PATH, const char * filename)
         flag = sscanf(buff, "%lf\n", &x);
         if (flag != 1)
         {
-            cout << buff << endl;
+            fprintf(stderr, "%s\n", buff);
             break;
         }
         else
@@ -129,9 +132,9 @@ void get_clean_data(FILE * data, const char * PATH, const char * filename)
             fprintf(out, "%lG\n", x);
         }
         if ((counter) % 100000 == 0)
-            cout << counter << endl;
+            fprintf(stderr, "%d\n", counter);
     }
-    cout << counter << endl;
+    fprintf(stderr, "%d\n", counter);
 }
 
 
@@ -151,16 +154,26 @@ int is_dirty_data(const char buff[])
 */
 
 
+char * get_output_filename(const char * prefix, const int number)
+{
+    char * result = new char[5 * MAX_LENGTH];
+    strcpy(result, prefix);
+    strcat(result, to_string(number).c_str());
+    strcat(result, ".txt");
+    return result;
+}
+
+
 int step_1(FILE * data, const char * PATH, const char * filename)
 {
     STEP1_STAGE++;
-    cout << "Running  [STEP_1: " << "STAGE_" << STEP1_STAGE << "]" << endl;
+    fprintf(stderr, "┏Running  [STEP_1: STAGE_%d]\n", STEP1_STAGE);
     FILE * out;
     write_in(&out, PATH, filename);
     int counter = 0;
     double * sorter = new double[MAX_SIZE];
     int flag = 0;
-    cout << "Reading in..." << endl;
+    fprintf(stderr, "┃Reading in...\n");
     while (!feof(data))
     {
         double x;
@@ -176,18 +189,98 @@ int step_1(FILE * data, const char * PATH, const char * filename)
         if (counter % INFO_INTERVAL == 0)
             print_patient_info();
     }
-    cout << endl << "Sorting..." << endl;
+    fprintf(stderr, "\b \b┃Sorting...\n");
     sort(sorter, sorter + MAX_SIZE);
-    cout << "Storing..." << endl;
+    fprintf(stderr, "┃Storing...\n");
     for (int _ = 0; _ < MAX_SIZE; _++)
     {
         fprintf(out, "%lG\n", sorter[_]);
         if (_ % INFO_INTERVAL == 0)
             print_patient_info();
     }
-    cout << endl << "Finished " << "[STEP_1: " << "STAGE_" << STEP1_STAGE << "]" << endl;
+    fprintf(stderr, "\b \b┗Finished [STEP_1: STAGE_%d]\n", STEP1_STAGE);
+    external_files.push(TOTAL_STAGE);
     delete[] sorter;
+    fclose(out);
     return flag;
+}
+
+
+void step_2(int file_number_1, int file_number_2, const char * PATH, const char * filename)
+{
+    FILE * data_1;
+    FILE * data_2;
+    read_in(&data_1, PATH, get_output_filename(prefix, file_number_1));
+    read_in(&data_2, PATH, get_output_filename(prefix, file_number_2));
+    STEP2_STAGE++;
+    fprintf(stderr, "┏Running  [STEP_2: STAGE_%d]\n", STEP2_STAGE);
+    FILE * out;
+    write_in(&out, PATH, filename);
+    fprintf(stderr, "┃Comparing & Storing... \n");
+    int counter = 0;
+    double x1 = 0.0, x2 = 0.0;
+    int flag = 0;
+    while (!feof(data_1) && !feof(data_2))
+    {
+        if (flag == 0)
+        {
+            fscanf(data_1, "%lf\n", &x1);
+            fscanf(data_2, "%lf\n", &x2);
+        }
+        if (flag == 1)
+            fscanf(data_1, "%lf\n", &x1);
+        if (flag == 2)
+            fscanf(data_2, "%lf\n", &x2);
+        if (x1 <= x2)
+        {
+            fprintf(out, "%lG\n", x1);
+            flag = 1;
+        }
+        else
+        {
+            fprintf(out, "%lG\n", x2);
+            flag = 2;
+        }
+        counter++;
+        if (counter % INFO_INTERVAL == 0)
+            print_patient_info();
+    }
+    while (!feof(data_1))
+    {
+        fscanf(data_1, "%lf\n", &x1);
+        fprintf(out, "%lG\n", x1);
+        counter++;
+        if (counter % INFO_INTERVAL == 0)
+        {
+            fprintf(stderr, "ttt1\n");
+            print_patient_info();
+        }
+    }
+    fclose(data_1);
+    while (!feof(data_2))
+    {
+        fscanf(data_2, "%lf\n", &x2);
+        fprintf(out, "%lG\n", x2);
+        counter++;
+        if (counter % INFO_INTERVAL == 0)
+        {
+            fprintf(stderr, "ttt2\n");
+            print_patient_info();
+        }
+    }
+    fclose(data_2);
+    fclose(out);
+    char file_name_1[5 * MAX_LENGTH];
+    char file_name_2[5 * MAX_LENGTH];
+    strcpy(file_name_1, PATH);
+    strcpy(file_name_2, PATH);
+    strcat(file_name_1, get_output_filename(prefix, file_number_1));
+    strcat(file_name_2, get_output_filename(prefix, file_number_2));
+    remove(file_name_1);
+    remove(file_name_2);
+    fprintf(stderr, "\b \b┃Removed intermediate file\n");
+    external_files.push(TOTAL_STAGE);
+    fprintf(stderr, "┗Finished [STEP_2: STAGE_%d]\n", STEP2_STAGE);
 }
 
 
@@ -198,17 +291,36 @@ int main(int argc, char const *argv[])
     start = clock();
 
 
-    FILE * fp;
+
+
+    FILE * origin;
 	argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
     char PATH[5 * MAX_LENGTH];
     strcpy(PATH, argv[0]);
     get_absolute_path(PATH);
+    read_in(&origin, PATH, FILENAME);
+    char * output;
+    while (!feof(origin))
+    {
+        output = get_output_filename(prefix, TOTAL_STAGE);
+        step_1(origin, PATH, output);
+        delete[] output;
+        TOTAL_STAGE++;
+    }
+    while (external_files.size() > 1)
+    {
+        int file_number_1 = external_files.front();
+        external_files.pop();
+        int file_number_2 = external_files.front();
+        external_files.pop();
+        output = get_output_filename(prefix, TOTAL_STAGE);
+        step_2(file_number_1, file_number_2, PATH, output);
+        TOTAL_STAGE++;
+    }
+    fclose(origin);
 
-    read_in(&fp, PATH, FILENAME);
 
-    step_1(fp, PATH, "output/001.txt");
-    step_1(fp, PATH, "output/002.txt");
-//    remove("/Users/apple/Documents/Data_Structures/project/output/001.txt");
+
 
 
     end = clock();
