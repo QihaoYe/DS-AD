@@ -1,0 +1,22 @@
+Assume that the RAM limit is 512M
+I would like to use about 400M to make sure this program will work successfully
+Internal sorting will consume at most twice of the size of the sorting array
+[400M / 2 -> 200M]
+[1M -> 1024K -> 1024 * 1024 bytes]
+[double -- 8 bytes]
+[200M / 8bytes -> 200 * 1024 * 1024 / 8 -> 26,214,400]
+Thus, I would take [the maximum size of the internal sorting = 25,000,000]
+According to the question, the size of the data is [N = 250,000,000]
+Also, it is easy to see that merge sorting is preferred
+First consider that if the data is all sorted by internal sorting
+The average time complexity of merge sorting is [round(NlogN) + 1 -> 6,974,338,214]
+Suppose that the CPU processing speed of the processing computer is [2.2GHz -> 2,200,000,000 calculations / sec]
+Then, the total time is [6,974,338,214 / 2,200,000,000 ~> 3.17 seconds]
+Second consider that if the data is all sorted by external sorting
+Suppose that we use a 5400-rpm mechanical hard disk, the read and write speed of it is about [75M / sec -> 75 * 1024 * 1024 bytes / sec]
+Obviously, the time consumption is most related to the speed of read and write
+[(NlogN * 8 bytes) / (75M / sec) ~> 6,974,338,214 / (75 * 1024 * 1024) ~> 88.68 seconds]
+Thus, the total time is about [88.68 seconds + 3.17 seconds -> 91.85 seconds]
+Therefore, it should work!
+PS:
+INT_MAX = 2,147,483,647 >> N

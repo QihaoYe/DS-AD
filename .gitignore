@@ -60,3 +60,5 @@ project/cmake-build-debug/
 project/External_Sorting
 project/regex/regex-2.7-setup.exe
 project/regex/regex.h
+!project/Random_Float_Generator.py
+!project/calculation.txt
