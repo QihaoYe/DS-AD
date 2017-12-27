@@ -5,12 +5,14 @@
 #define MAX_SIZE 25000000
 #define INFO_INTERVAL 2000000
 #define FatalError(code) fprintf(stderr, code)
+#define ORIGINAL_STARTING_VALUE 0
+#define STEP_1_FINISHED_VALUE 10
 using namespace std;
 char FILENAME[] = "massive_float/clean_data.txt";
 char prefix[] = "output/";
-int STEP1_STAGE = 0;
-int STEP2_STAGE = 0;
-int TOTAL_STAGE = 0;
+int STEP1_STAGE = ORIGINAL_STARTING_VALUE;
+int STEP2_STAGE = ORIGINAL_STARTING_VALUE;
+int TOTAL_STAGE = ORIGINAL_STARTING_VALUE;
 char PATIENT_INFO[] = "-\\|/";
 int PATIENT_COUNTER = 0;
 queue<int> external_files;
