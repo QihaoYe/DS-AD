@@ -10,9 +10,9 @@
 using namespace std;
 char FILENAME[] = "massive_float/clean_data.txt";
 char prefix[] = "output/";
-int STEP1_STAGE = ORIGINAL_STARTING_VALUE;
+int STEP1_STAGE = STEP_1_FINISHED_VALUE;
 int STEP2_STAGE = ORIGINAL_STARTING_VALUE;
-int TOTAL_STAGE = ORIGINAL_STARTING_VALUE;
+int TOTAL_STAGE = STEP_1_FINISHED_VALUE;
 char PATIENT_INFO[] = "-\\|/";
 int PATIENT_COUNTER = 0;
 queue<int> external_files;
@@ -279,6 +279,78 @@ void step_2(int file_number_1, int file_number_2, const char * PATH, const char 
 }
 
 
+void step_2_0(int file_num, const char * PATH, const char * filename)
+{
+    FILE * data[file_num];
+    int i;
+    for (i = 0; i < file_num; i++)
+        read_in(&data[i], PATH, get_output_filename(prefix, i));
+    STEP2_STAGE++;
+    fprintf(stderr, "┏Running  [STEP_2: STAGE_%d]\n", STEP2_STAGE);
+    FILE * out;
+    write_in(&out, PATH, filename);
+    fprintf(stderr, "┃Comparing & Storing... \n");
+    int counter = 0;
+    double x[file_num];
+    int flag = -1;
+    int finish_flag = 0;
+    int finished[file_num];
+    memset(finished, 0, sizeof(finished));
+    while (1)
+    {
+        for (i = 0; i < file_num; i++)
+            if (finished[i]);
+            else if (feof(data[i]))
+            {
+                finished[i] = 1;
+                finish_flag++;
+                cout << i << endl;
+            }
+        if (finish_flag >= file_num - 1)
+            break;
+        if (flag == -1)
+            for (i = 0; i < file_num; i++)
+                fscanf(data[i], "%lf\n", &x[i]);
+        for (i = 0; i < file_num; i++)
+            if (flag == i)
+                fscanf(data[i], "%lf\n", &x[i]);
+        double m = 2e-308;
+        for (i = 0; i < file_num; i++)
+            if (finished[i])
+                continue;
+            else if (x[i] <= m)
+                flag = i;
+        fprintf(out, "%lG\n", x[flag]);
+        counter++;
+        if (counter % INFO_INTERVAL == 0)
+            print_patient_info();
+    }
+    for (i = 0; i < file_num; i++)
+    {
+        while (!feof(data[i]))
+        {
+            fscanf(data[i], "%lf\n", &x[i]);
+            fprintf(out, "%lG\n", x[i]);
+            counter++;
+            if (counter % INFO_INTERVAL == 0)
+                print_patient_info();
+        }
+    }
+    for (i = 0; i < file_num; i++)
+    {
+        fclose(data[i]);
+        char file_name[5 * MAX_LENGTH];
+        strcpy(file_name, PATH);
+        strcat(file_name, get_output_filename(prefix, i));
+        remove(file_name);
+    }
+
+    fclose(out);
+    fprintf(stderr, "\b \b┃Removed intermediate file\n");
+    fprintf(stderr, "┗Finished [STEP_2: STAGE_%d]\n", STEP2_STAGE);
+}
+
+
 //    get_clean_data(fp, PATH, "output/clean_data.txt");
 int main(int argc, char const *argv[])
 {
@@ -295,23 +367,26 @@ int main(int argc, char const *argv[])
     get_absolute_path(PATH);
     read_in(&origin, PATH, FILENAME);
     char * output;
-    while (!feof(origin))
-    {
-        output = get_output_filename(prefix, TOTAL_STAGE);
-        step_1(origin, PATH, output);
-        delete[] output;
-        TOTAL_STAGE++;
-    }
-    while (external_files.size() > 1)
-    {
-        int file_number_1 = external_files.front();
-        external_files.pop();
-        int file_number_2 = external_files.front();
-        external_files.pop();
-        output = get_output_filename(prefix, TOTAL_STAGE);
-        step_2(file_number_1, file_number_2, PATH, output);
-        TOTAL_STAGE++;
-    }
+//    while (!feof(origin))
+//    {
+//        output = get_output_filename(prefix, TOTAL_STAGE);
+//        step_1(origin, PATH, output);
+//        delete[] output;
+//        TOTAL_STAGE++;
+//    }
+//    while (external_files.size() > 1)
+//    {
+//        int file_number_1 = external_files.front();
+//        external_files.pop();
+//        int file_number_2 = external_files.front();
+//        external_files.pop();
+//        output = get_output_filename(prefix, TOTAL_STAGE);
+//        step_2(file_number_1, file_number_2, PATH, output);
+//        TOTAL_STAGE++;
+//    }
+    output = get_output_filename(prefix, 11);
+    step_2_0(10, PATH, output);
+    TOTAL_STAGE++;
     fclose(origin);
 
 
