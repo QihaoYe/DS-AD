@@ -1,6 +1,8 @@
 #include <iostream>
 #include <queue>
 #include <regex.h>
+#include <iostream>
+#include <fstream>
 #define MAX_LENGTH 64
 #define MAX_SIZE 25000000
 #define INFO_INTERVAL 2000000
@@ -10,9 +12,9 @@
 using namespace std;
 char FILENAME[] = "massive_float/clean_data.txt";
 char prefix[] = "output/";
-int STEP1_STAGE = STEP_1_FINISHED_VALUE;
+int STEP1_STAGE = ORIGINAL_STARTING_VALUE;
 int STEP2_STAGE = ORIGINAL_STARTING_VALUE;
-int TOTAL_STAGE = STEP_1_FINISHED_VALUE;
+int TOTAL_STAGE = ORIGINAL_STARTING_VALUE;
 char PATIENT_INFO[] = "-\\|/";
 int PATIENT_COUNTER = 0;
 queue<int> external_files;
@@ -207,6 +209,66 @@ int step_1(FILE * data, const char * PATH, const char * filename)
 }
 
 
+//double get_one_double(FILE * data)
+//{
+//    char buffer;
+//    char f[15];
+//    int c = 0;
+//    while (1)
+//    {
+//        fread(&buffer, sizeof(char), 1, data);
+//        if (buffer == '\n')
+//        {
+//            f[c] = '\0';
+//            return strtod(f, NULL);
+//        }
+//        else
+//            f[c++] = buffer;
+//    }
+//}
+//
+//
+//void step_1_0(FILE * data, const char * PATH, const char * filename)
+//{
+//    STEP1_STAGE++;
+//    fprintf(stderr, "┏Running  [STEP_1: STAGE_%d]\n", STEP1_STAGE);
+//    FILE * out;
+//    write_in(&out, PATH, filename);
+//    int counter = 0;
+//    double * sorter = new double[MAX_SIZE];
+//    int flag = 0;
+//    fprintf(stderr, "┃Reading in...\n");
+//    while (!feof(data))
+//    {
+//        double x;
+//        flag = fscanf(data, "%lf\n", &x);
+//        if (flag != 1)
+//            break;
+//        sorter[counter++] = x;
+//        if (MAX_SIZE == counter)
+//        {
+//            flag = 2;
+//            break;
+//        }
+//        if (counter % INFO_INTERVAL == 0)
+//            print_patient_info();
+//    }
+//    fprintf(stderr, "\b \b┃Sorting...\n");
+//    sort(sorter, sorter + MAX_SIZE);
+//    fprintf(stderr, "┃Storing...\n");
+//    for (int _ = 0; _ < MAX_SIZE; _++)
+//    {
+//        fprintf(out, "%lG\n", sorter[_]);
+//        if (_ % INFO_INTERVAL == 0)
+//            print_patient_info();
+//    }
+//    fprintf(stderr, "\b \b┗Finished [STEP_1: STAGE_%d]\n", STEP1_STAGE);
+//    external_files.push(TOTAL_STAGE);
+//    delete[] sorter;
+//    fclose(out);
+//}
+
+
 void step_2(int file_number_1, int file_number_2, const char * PATH, const char * filename)
 {
     FILE * data_1;
@@ -279,6 +341,7 @@ void step_2(int file_number_1, int file_number_2, const char * PATH, const char 
 }
 
 
+// multi-way merge
 void step_2_0(int file_num, const char * PATH, const char * filename)
 {
     FILE * data[file_num];
@@ -304,7 +367,6 @@ void step_2_0(int file_num, const char * PATH, const char * filename)
             {
                 finished[i] = 1;
                 finish_flag++;
-                cout << i << endl;
             }
         if (finish_flag >= file_num - 1)
             break;
@@ -314,12 +376,17 @@ void step_2_0(int file_num, const char * PATH, const char * filename)
         for (i = 0; i < file_num; i++)
             if (flag == i)
                 fscanf(data[i], "%lf\n", &x[i]);
-        double m = 2e-308;
+        double m = 1e+308;
         for (i = 0; i < file_num; i++)
+        {
             if (finished[i])
                 continue;
             else if (x[i] <= m)
+            {
+                m = x[i];
                 flag = i;
+            }
+        }
         fprintf(out, "%lG\n", x[flag]);
         counter++;
         if (counter % INFO_INTERVAL == 0)
@@ -344,7 +411,6 @@ void step_2_0(int file_num, const char * PATH, const char * filename)
         strcat(file_name, get_output_filename(prefix, i));
         remove(file_name);
     }
-
     fclose(out);
     fprintf(stderr, "\b \b┃Removed intermediate file\n");
     fprintf(stderr, "┗Finished [STEP_2: STAGE_%d]\n", STEP2_STAGE);
@@ -352,28 +418,7 @@ void step_2_0(int file_num, const char * PATH, const char * filename)
 
 
 //    get_clean_data(fp, PATH, "output/clean_data.txt");
-int main(int argc, char const *argv[])
-{
-    time_t start, end;
-    start = clock();
 
-
-
-
-    FILE * origin;
-	argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
-    char PATH[5 * MAX_LENGTH];
-    strcpy(PATH, argv[0]);
-    get_absolute_path(PATH);
-    read_in(&origin, PATH, FILENAME);
-    char * output;
-//    while (!feof(origin))
-//    {
-//        output = get_output_filename(prefix, TOTAL_STAGE);
-//        step_1(origin, PATH, output);
-//        delete[] output;
-//        TOTAL_STAGE++;
-//    }
 //    while (external_files.size() > 1)
 //    {
 //        int file_number_1 = external_files.front();
@@ -384,10 +429,77 @@ int main(int argc, char const *argv[])
 //        step_2(file_number_1, file_number_2, PATH, output);
 //        TOTAL_STAGE++;
 //    }
-    output = get_output_filename(prefix, 11);
-    step_2_0(10, PATH, output);
-    TOTAL_STAGE++;
-    fclose(origin);
+
+//int main(int argc, char const *argv[])
+//{
+//    time_t start, end;
+//    start = clock();
+//
+//
+//
+//
+//    FILE * origin;
+//	argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
+//    char PATH[5 * MAX_LENGTH];
+//    strcpy(PATH, argv[0]);
+//    get_absolute_path(PATH);
+//    read_in(&origin, PATH, FILENAME);
+//    char * output;
+//    while (!feof(origin))
+//    {
+//        output = get_output_filename(prefix, TOTAL_STAGE);
+//        step_1(origin, PATH, output);
+//        delete[] output;
+//        TOTAL_STAGE++;
+//    }
+//    output = get_output_filename(prefix, TOTAL_STAGE);
+//    step_2_0(TOTAL_STAGE, PATH, output);
+//    TOTAL_STAGE++;
+//    fclose(origin);
+//
+//
+//
+//
+//
+//    end = clock();
+//    cout << (double)((end - start) / CLOCKS_PER_SEC) << endl;
+//	return 0;
+//}
+
+int main(int argc, char const *argv[])
+{
+    time_t start, end;
+    start = clock();
+
+
+
+
+//    FILE * origin;
+//    argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
+//    char PATH[5 * MAX_LENGTH];
+//    strcpy(PATH, argv[0]);
+//    get_absolute_path(PATH);
+//    read_in(&origin, PATH, FILENAME);
+//    double a;
+//    int count = 0;
+//    while (!feof(origin))
+//    {
+//        a = get_one_double(origin);
+//        count++;
+//        if (count % INFO_INTERVAL == 0)
+//            cout << count << endl;
+//    }
+    fstream fin, fout;
+    fin.open("/Users/apple/Documents/Data_Structures/project/massive_float/clean_data.txt", fstream::in);
+    fout.open("/Users/apple/Documents/Data_Structures/project/output/test.bin", fstream::out | fstream::binary);
+
+    double num;
+    while(fin.read((char *)&num, sizeof(double))) {
+        fout.write((char *)&num, sizeof(double));
+    }
+    fout.close();
+    fin.close();
+//    fclose(origin);
 
 
 
@@ -395,5 +507,5 @@ int main(int argc, char const *argv[])
 
     end = clock();
     cout << (double)((end - start) / CLOCKS_PER_SEC) << endl;
-	return 0;
+    return 0;
 }
