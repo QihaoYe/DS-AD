@@ -10,7 +10,7 @@
 #define ORIGINAL_STARTING_VALUE 0
 #define STEP_1_FINISHED_VALUE 10
 using namespace std;
-char FILENAME[] = "massive_float/clean_data.txt";
+char FILENAME[] = "massive_float/test.bin";
 char prefix[] = "output/";
 int STEP1_STAGE = ORIGINAL_STARTING_VALUE;
 int STEP2_STAGE = ORIGINAL_STARTING_VALUE;
@@ -474,14 +474,14 @@ int main(int argc, char const *argv[])
 
 
 
-//    FILE * origin;
-//    argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
-//    char PATH[5 * MAX_LENGTH];
-//    strcpy(PATH, argv[0]);
-//    get_absolute_path(PATH);
-//    read_in(&origin, PATH, FILENAME);
-//    double a;
-//    int count = 0;
+    FILE * origin;
+    argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
+    char PATH[5 * MAX_LENGTH];
+    strcpy(PATH, argv[0]);
+    get_absolute_path(PATH);
+    read_in(&origin, PATH, FILENAME);
+    double a;
+    int count = 0;
 //    while (!feof(origin))
 //    {
 //        a = get_one_double(origin);
@@ -489,17 +489,21 @@ int main(int argc, char const *argv[])
 //        if (count % INFO_INTERVAL == 0)
 //            cout << count << endl;
 //    }
-    fstream fin, fout;
-    fin.open("/Users/apple/Documents/Data_Structures/project/massive_float/clean_data.txt", fstream::in);
-    fout.open("/Users/apple/Documents/Data_Structures/project/output/test.bin", fstream::out | fstream::binary);
 
-    double num;
-    while(fin.read((char *)&num, sizeof(double))) {
-        fout.write((char *)&num, sizeof(double));
-    }
-    fout.close();
-    fin.close();
-//    fclose(origin);
+
+//    fstream fin, fout;
+//    fin.open("/Users/apple/Documents/Data_Structures/project/massive_float/clean_data.txt", fstream::in);
+//    fout.open("/Users/apple/Documents/Data_Structures/project/output/test.bin", fstream::out | fstream::binary);
+//
+//    double num;
+//    while(fin.read((char *)&num, sizeof(double))) {
+//        fout.write((char *)&num, sizeof(double));
+//    }
+//    fout.close();
+//    fin.close();
+
+
+    fclose(origin);
 
 
 
