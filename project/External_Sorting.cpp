@@ -1,7 +1,6 @@
 #include <iostream>
 #include <queue>
 #include <regex.h>
-#include <iostream>
 #include <fstream>
 #define MAX_LENGTH 64
 #define MAX_SIZE 25000000
