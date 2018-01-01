@@ -19,6 +19,117 @@ int PATIENT_COUNTER = 0;
 queue<int> external_files;
 
 
+void next_patient_counter(int * patient_counter);
+void print_patient_info();
+void get_absolute_path(char document[]);
+void read_in(FILE ** fp, const char * PATH, const char * filename);
+void write_in(FILE ** fp, const char * PATH, const char * filename);
+int is_dirty_data(const char buff[]);
+void get_clean_data(FILE * data, const char * PATH, const char * filename);
+char * get_output_filename(const char * prefix, const int number);
+int step_1(FILE * data, const char * PATH, const char * filename);
+void step_2(int file_number_1, int file_number_2, const char * PATH, const char * filename);
+void step_2_0(int file_num, const char * PATH, const char * filename);
+
+
+//    get_clean_data(fp, PATH, "output/clean_data.txt");
+
+//    while (external_files.size() > 1)
+//    {
+//        int file_number_1 = external_files.front();
+//        external_files.pop();
+//        int file_number_2 = external_files.front();
+//        external_files.pop();
+//        output = get_output_filename(prefix, TOTAL_STAGE);
+//        step_2(file_number_1, file_number_2, PATH, output);
+//        TOTAL_STAGE++;
+//    }
+
+//int main(int argc, char const *argv[])
+//{
+//    time_t start, end;
+//    start = clock();
+//
+//
+//
+//
+//    FILE * origin;
+//	argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
+//    char PATH[5 * MAX_LENGTH];
+//    strcpy(PATH, argv[0]);
+//    get_absolute_path(PATH);
+//    read_in(&origin, PATH, FILENAME);
+//    char * output;
+//    while (!feof(origin))
+//    {
+//        output = get_output_filename(prefix, TOTAL_STAGE);
+//        step_1(origin, PATH, output);
+//        delete[] output;
+//        TOTAL_STAGE++;
+//    }
+//    output = get_output_filename(prefix, TOTAL_STAGE);
+//    step_2_0(TOTAL_STAGE, PATH, output);
+//    TOTAL_STAGE++;
+//    fclose(origin);
+//
+//
+//
+//
+//
+//    end = clock();
+//    cout << (double)((end - start) / CLOCKS_PER_SEC) << endl;
+//	return 0;
+//}
+
+int main(int argc, char const *argv[])
+{
+    time_t start, end;
+    start = clock();
+
+
+
+
+    FILE * origin;
+    argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
+    char PATH[5 * MAX_LENGTH];
+    strcpy(PATH, argv[0]);
+    get_absolute_path(PATH);
+    read_in(&origin, PATH, FILENAME);
+    double a;
+    int count = 0;
+//    while (!feof(origin))
+//    {
+//        a = get_one_double(origin);
+//        count++;
+//        if (count % INFO_INTERVAL == 0)
+//            cout << count << endl;
+//    }
+
+
+//    fstream fin, fout;
+//    fin.open("/Users/apple/Documents/Data_Structures/project/massive_float/clean_data.txt", fstream::in);
+//    fout.open("/Users/apple/Documents/Data_Structures/project/output/test.bin", fstream::out | fstream::binary);
+//
+//    double num;
+//    while(fin.read((char *)&num, sizeof(double))) {
+//        fout.write((char *)&num, sizeof(double));
+//    }
+//    fout.close();
+//    fin.close();
+
+
+    fclose(origin);
+
+
+
+
+
+    end = clock();
+    cout << (double)((end - start) / CLOCKS_PER_SEC) << endl;
+    return 0;
+}
+
+
 void next_patient_counter(int * patient_counter)
 {
     *(patient_counter) = (*(patient_counter) + 1) % 4;
@@ -415,100 +526,3 @@ void step_2_0(int file_num, const char * PATH, const char * filename)
     fprintf(stderr, "┗Finished [STEP_2: STAGE_%d]\n", STEP2_STAGE);
 }
 
-
-//    get_clean_data(fp, PATH, "output/clean_data.txt");
-
-//    while (external_files.size() > 1)
-//    {
-//        int file_number_1 = external_files.front();
-//        external_files.pop();
-//        int file_number_2 = external_files.front();
-//        external_files.pop();
-//        output = get_output_filename(prefix, TOTAL_STAGE);
-//        step_2(file_number_1, file_number_2, PATH, output);
-//        TOTAL_STAGE++;
-//    }
-
-//int main(int argc, char const *argv[])
-//{
-//    time_t start, end;
-//    start = clock();
-//
-//
-//
-//
-//    FILE * origin;
-//	argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
-//    char PATH[5 * MAX_LENGTH];
-//    strcpy(PATH, argv[0]);
-//    get_absolute_path(PATH);
-//    read_in(&origin, PATH, FILENAME);
-//    char * output;
-//    while (!feof(origin))
-//    {
-//        output = get_output_filename(prefix, TOTAL_STAGE);
-//        step_1(origin, PATH, output);
-//        delete[] output;
-//        TOTAL_STAGE++;
-//    }
-//    output = get_output_filename(prefix, TOTAL_STAGE);
-//    step_2_0(TOTAL_STAGE, PATH, output);
-//    TOTAL_STAGE++;
-//    fclose(origin);
-//
-//
-//
-//
-//
-//    end = clock();
-//    cout << (double)((end - start) / CLOCKS_PER_SEC) << endl;
-//	return 0;
-//}
-
-int main(int argc, char const *argv[])
-{
-    time_t start, end;
-    start = clock();
-
-
-
-
-    FILE * origin;
-    argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
-    char PATH[5 * MAX_LENGTH];
-    strcpy(PATH, argv[0]);
-    get_absolute_path(PATH);
-    read_in(&origin, PATH, FILENAME);
-    double a;
-    int count = 0;
-//    while (!feof(origin))
-//    {
-//        a = get_one_double(origin);
-//        count++;
-//        if (count % INFO_INTERVAL == 0)
-//            cout << count << endl;
-//    }
-
-
-//    fstream fin, fout;
-//    fin.open("/Users/apple/Documents/Data_Structures/project/massive_float/clean_data.txt", fstream::in);
-//    fout.open("/Users/apple/Documents/Data_Structures/project/output/test.bin", fstream::out | fstream::binary);
-//
-//    double num;
-//    while(fin.read((char *)&num, sizeof(double))) {
-//        fout.write((char *)&num, sizeof(double));
-//    }
-//    fout.close();
-//    fin.close();
-
-
-    fclose(origin);
-
-
-
-
-
-    end = clock();
-    cout << (double)((end - start) / CLOCKS_PER_SEC) << endl;
-    return 0;
-}
