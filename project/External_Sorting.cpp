@@ -8,12 +8,13 @@
 #define FatalError(code) fprintf(stderr, code)
 #define ORIGINAL_STARTING_VALUE 0
 #define STEP_1_FINISHED_VALUE 10
+#define CLOCKS_PER_SEC 1000000.0
 using namespace std;
 char FILENAME[] = "massive_float/clean_data.txt";
 char prefix[] = "output/";
 int STEP1_STAGE = ORIGINAL_STARTING_VALUE;
 int STEP2_STAGE = ORIGINAL_STARTING_VALUE;
-int TOTAL_STAGE = STEP_1_FINISHED_VALUE;
+int TOTAL_STAGE = ORIGINAL_STARTING_VALUE;
 char PATIENT_INFO[] = "-\\|/";
 int PATIENT_COUNTER = 0;
 queue<int> external_files;
@@ -100,13 +101,13 @@ int main(int argc, char const *argv[])
     get_absolute_path(PATH);
     char * output;
     fstream origin(get_absolute_filename(PATH, FILENAME), fstream::in);
-//    while (origin.peek() != EOF)
-//    {
-//        output = get_output_filename(prefix, TOTAL_STAGE);
-//        step_1_0(&origin, get_absolute_filename(PATH, output));
-//        delete[] output;
-//        TOTAL_STAGE++;
-//    }
+    while (origin.peek() != EOF)
+    {
+        output = get_output_filename(prefix, TOTAL_STAGE);
+        step_1_0(&origin, get_absolute_filename(PATH, output));
+        delete[] output;
+        TOTAL_STAGE++;
+    }
     output = get_output_filename(prefix, TOTAL_STAGE);
     step_2_1(TOTAL_STAGE, PATH, output);
     TOTAL_STAGE++;
@@ -114,7 +115,7 @@ int main(int argc, char const *argv[])
 
 
     end = clock();
-    fprintf(stderr, "TOTAL TIME: %lG\n", (double)((end - start) / CLOCKS_PER_SEC));
+    fprintf(stderr, "TOTAL TIME: %lgs\n", (double)((end - start) / CLOCKS_PER_SEC));
     return 0;
 }
 
@@ -401,13 +402,13 @@ void step_1_0(fstream * data, const char * absolute_filename)
             print_patient_info();
     }
     end = clock();
-    fprintf(stderr, "\b \b┃Time: %lg\n", (double)((end - start) / CLOCKS_PER_SEC));
+    fprintf(stderr, "\b \b┃Time: %lgs\n", (double)((end - start) / CLOCKS_PER_SEC));
 
     fprintf(stderr, "┃Sorting...\n");
     mid = clock();
     sort(sorter, sorter + counter);
     end = clock();
-    fprintf(stderr, "┃Time: %lg\n", (double)((end - mid) / CLOCKS_PER_SEC));
+    fprintf(stderr, "┃Time: %lgs\n", (double)((end - mid) / CLOCKS_PER_SEC));
 
     fprintf(stderr, "┃Storing...\n");
     mid = clock();
@@ -420,8 +421,8 @@ void step_1_0(fstream * data, const char * absolute_filename)
             print_patient_info();
     }
     end = clock();
-    fprintf(stderr, "\b \b┃Time: %lg\n", (double)((end - mid) / CLOCKS_PER_SEC));
-    fprintf(stderr, "┗Finished [STEP_1: STAGE_%d]  Time spent:%lg\n", STEP1_STAGE, (double)((end - start) / CLOCKS_PER_SEC));
+    fprintf(stderr, "\b \b┃Time: %lgs\n", (double)((end - mid) / CLOCKS_PER_SEC));
+    fprintf(stderr, "┗Finished [STEP_1: STAGE_%d]  Time spent:%lgs\n", STEP1_STAGE, (double)((end - start) / CLOCKS_PER_SEC));
     delete[] sorter;
     out.close();
 }
@@ -577,10 +578,14 @@ void step_2_0(int file_num, const char * PATH, const char * filename)
 
 void step_2_1(int file_num, const char * PATH, const char * filename)
 {
-    fstream * data[file_num];
+    time_t start, end;
+    start = clock();
+
+
+    fstream * data = new fstream[file_num];
     int i;
     for (i = 0; i < file_num; i++)
-        (*data[i]).open(get_absolute_filename(PATH, get_output_filename(prefix, i)), fstream::in);
+        (data[i]).open(get_absolute_filename(PATH, get_output_filename(prefix, i)), fstream::in);
     STEP2_STAGE++;
     fprintf(stderr, "┏Running  [STEP_2]\n");
     fstream out(get_absolute_filename(PATH, filename), fstream::out);
@@ -598,7 +603,7 @@ void step_2_1(int file_num, const char * PATH, const char * filename)
     {
         for (i = 0; i < file_num; i++)
             if (finished[i]);
-            else if ((*data[i]).peek() == EOF)
+            else if ((data[i]).peek() == EOF)
             {
                 finished[i] = 1;
                 finish_flag++;
@@ -608,13 +613,13 @@ void step_2_1(int file_num, const char * PATH, const char * filename)
         if (flag == -1)
             for (i = 0; i < file_num; i++)
             {
-                (*data[i]).read(temp[i], 18);
+                (data[i]).read(temp[i], 18);
                 x[i] = str2double(temp[i]);
             }
         for (i = 0; i < file_num; i++)
             if (flag == i)
             {
-                (*data[i]).read(temp[i], 18);
+                (data[i]).read(temp[i], 18);
                 x[i] = str2double(temp[i]);
             }
         double m = 1e+308;
@@ -635,9 +640,9 @@ void step_2_1(int file_num, const char * PATH, const char * filename)
     }
     for (i = 0; i < file_num; i++)
     {
-        while ((*data[i]).peek() != EOF)
+        while ((data[i]).peek() != EOF)
         {
-            (*data[i]).read(temp[i], 18);
+            (data[i]).read(temp[i], 18);
             out.write(temp[i], 18);
             counter++;
             if (counter % INFO_INTERVAL == 0)
@@ -646,7 +651,7 @@ void step_2_1(int file_num, const char * PATH, const char * filename)
     }
     for (i = 0; i < file_num; i++)
     {
-        (*data[i]).close();
+        (data[i]).close();
         char file_name[5 * MAX_LENGTH];
         strcpy(file_name, PATH);
         strcat(file_name, get_output_filename(prefix, i));
@@ -654,7 +659,9 @@ void step_2_1(int file_num, const char * PATH, const char * filename)
     }
     for (i = 0; i < file_num; i++)
         delete[] temp[i];
+    delete[] data;
     out.close();
     fprintf(stderr, "\b \b┃Removed intermediate file\n");
-    fprintf(stderr, "┗Finished [STEP_2]\n");
+    end = clock();
+    fprintf(stderr, "┗Finished [STEP_2] Time spent:%lgs\n", (double)((end - start) / CLOCKS_PER_SEC));
 }
