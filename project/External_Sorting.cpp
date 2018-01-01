@@ -9,7 +9,7 @@
 #define ORIGINAL_STARTING_VALUE 0
 #define STEP_1_FINISHED_VALUE 10
 using namespace std;
-char FILENAME[] = "massive_float/test.bin";
+char FILENAME[] = "massive_float/clean_data.txt";
 char prefix[] = "output/";
 int STEP1_STAGE = ORIGINAL_STARTING_VALUE;
 int STEP2_STAGE = ORIGINAL_STARTING_VALUE;
@@ -22,17 +22,17 @@ queue<int> external_files;
 void next_patient_counter(int * patient_counter);
 void print_patient_info();
 void get_absolute_path(char document[]);
+char * get_absolute_filename(const char * PATH, const char * filename);
 void read_in(FILE ** fp, const char * PATH, const char * filename);
 void write_in(FILE ** fp, const char * PATH, const char * filename);
 int is_dirty_data(const char buff[]);
-void get_clean_data(FILE * data, const char * PATH, const char * filename);
 char * get_output_filename(const char * prefix, const int number);
 int step_1(FILE * data, const char * PATH, const char * filename);
 void step_2(int file_number_1, int file_number_2, const char * PATH, const char * filename);
 void step_2_0(int file_num, const char * PATH, const char * filename);
 
 
-//    get_clean_data(fp, PATH, "output/clean_data.txt");
+
 
 //    while (external_files.size() > 1)
 //    {
@@ -81,47 +81,48 @@ void step_2_0(int file_num, const char * PATH, const char * filename);
 //	return 0;
 //}
 
+
 int main(int argc, char const *argv[])
 {
     time_t start, end;
     start = clock();
 
 
-
-
-    FILE * origin;
     argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
     char PATH[5 * MAX_LENGTH];
     strcpy(PATH, argv[0]);
     get_absolute_path(PATH);
-    read_in(&origin, PATH, FILENAME);
+    fstream origin;
+    origin.open(get_absolute_filename(PATH, FILENAME), fstream::in);
     double a;
     int count = 0;
-//    while (!feof(origin))
-//    {
-//        a = get_one_double(origin);
-//        count++;
-//        if (count % INFO_INTERVAL == 0)
-//            cout << count << endl;
-//    }
+    int N;
+    while (1)
+    {
+        N = origin.read((char *)&a, 18);
+        if (N != 1)
+            break;
+        count++;
+        if (count % 20000000 == 0)
+            cout << count << endl;
+
+    }
 
 
-//    fstream fin, fout;
-//    fin.open("/Users/apple/Documents/Data_Structures/project/massive_float/clean_data.txt", fstream::in);
-//    fout.open("/Users/apple/Documents/Data_Structures/project/output/test.bin", fstream::out | fstream::binary);
-//
 //    double num;
-//    while(fin.read((char *)&num, sizeof(double))) {
-//        fout.write((char *)&num, sizeof(double));
+//    while(fin.read((char *)&num, 18)) {
+//        count++;
+//        fout.write((char *)&num, 18);
 //    }
+//
 //    fout.close();
 //    fin.close();
+//    cout << count << endl;
 
-
-    fclose(origin);
-
-
-
+    cout << a << endl;
+    cout << N << endl;
+    cout << count << endl;
+    origin.close();
 
 
     end = clock();
@@ -152,6 +153,15 @@ void get_absolute_path(char document[])
             break;
         document[i] = '\0';
     }
+}
+
+
+char * get_absolute_filename(const char * PATH, const char * filename)
+{
+    char * result = new char[5 * MAX_LENGTH];
+    strcpy(result, PATH);
+    strcat(result, filename);
+    return result;
 }
 
 
@@ -221,6 +231,7 @@ int is_dirty_data(const char buff[])
 }
 
 
+void get_clean_data(FILE * data, const char * PATH, const char * filename);
 void get_clean_data(FILE * data, const char * PATH, const char * filename)
 {
     FILE * out;
@@ -242,13 +253,14 @@ void get_clean_data(FILE * data, const char * PATH, const char * filename)
         else
         {
             counter++;
-            fprintf(out, "%lG\n", x);
+            fprintf(out, "%-+17.9E\n", x);
         }
         if ((counter) % 100000 == 0)
             fprintf(stderr, "%d\n", counter);
     }
     fprintf(stderr, "%d\n", counter);
 }
+//    get_clean_data(origin, PATH, "output/clean_data.txt");
 
 
 /*
@@ -316,6 +328,46 @@ int step_1(FILE * data, const char * PATH, const char * filename)
     delete[] sorter;
     fclose(out);
     return flag;
+}
+
+
+void step_1_0(fstream data, const char * absolute_filename)
+{
+    STEP1_STAGE++;
+    fprintf(stderr, "┏Running  [STEP_1: STAGE_%d]\n", STEP1_STAGE);
+    fstream out;
+    out.open(absolute_filename, fstream::out);
+    int counter = 0;
+    double * sorter = new double[MAX_SIZE];
+    int flag = 0;
+    fprintf(stderr, "┃Reading in...\n");
+    while (1)
+    {
+        double x;
+        flag = data.read((char *)&x, 18);
+        if (flag != 1)
+            break;
+        sorter[counter++] = x;
+        if (MAX_SIZE == counter)
+        {
+            flag = 2;
+            break;
+        }
+        if (counter % INFO_INTERVAL == 0)
+            print_patient_info();
+    }
+    fprintf(stderr, "\b \b┃Sorting...\n");
+    sort(sorter, sorter + MAX_SIZE);
+    fprintf(stderr, "┃Storing...\n");
+    for (int _ = 0; _ < MAX_SIZE; _++)
+    {
+        out.write("%-+17.9E\n", sorter[_]);
+        if (_ % INFO_INTERVAL == 0)
+            print_patient_info();
+    }
+    fprintf(stderr, "\b \b┗Finished [STEP_1: STAGE_%d]\n", STEP1_STAGE);
+    delete[] sorter;
+    out.close();
 }
 
 

@@ -63,3 +63,4 @@ project/regex/regex.h
 !project/Random_Float_Generator.py
 !project/calculation.txt
 *.bin
+*.pdf
