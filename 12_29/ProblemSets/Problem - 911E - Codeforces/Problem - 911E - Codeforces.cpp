@@ -5,9 +5,9 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
     int n, k, _, m = 1;
+    scanf("%d%d", &n, &k);
     int * p = new int[k];
     int * stack = new int[k + 1];
-    scanf("%d%d", &n, &k);
     stack[0] = n + 1;
     int top = 0;
     for (_ = 0; _ < k; _++)
