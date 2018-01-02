@@ -1,14 +1,12 @@
 #include <iostream>
-#include <queue>
-#include <regex.h>
 #include <fstream>
 #define MAX_LENGTH 64
 #define MAX_SIZE 25000000
 #define INFO_INTERVAL 2000000
-#define FatalError(code) fprintf(stderr, code)
 #define ORIGINAL_STARTING_VALUE 0
-#define STEP_1_FINISHED_VALUE 10
-#define CLOCKS_PER_SEC 1000000.0
+// Assume all files will open correctly
+//#define STEP_1_FINISHED_VALUE 10
+// Used to debug
 using namespace std;
 char FILENAME[] = "massive_float/clean_data.txt";
 char prefix[] = "output/";
@@ -17,77 +15,23 @@ int STEP2_STAGE = ORIGINAL_STARTING_VALUE;
 int TOTAL_STAGE = ORIGINAL_STARTING_VALUE;
 char PATIENT_INFO[] = "-\\|/";
 int PATIENT_COUNTER = 0;
-queue<int> external_files;
-
-
 
 
 void next_patient_counter(int * patient_counter);
 void print_patient_info();
 void get_absolute_path(char document[]);
 char * get_absolute_filename(const char * PATH, const char * filename);
-void read_in(FILE ** fp, const char * PATH, const char * filename);
-void write_in(FILE ** fp, const char * PATH, const char * filename);
-int is_dirty_data(const char buff[]);
 char * get_output_filename(const char * prefix, int number);
 double str2double(char str[]);
-int step_1(FILE * data, const char * PATH, const char * filename);
 void step_1_0(fstream * data, const char * absolute_filename);
-void step_2(int file_number_1, int file_number_2, const char * PATH, const char * filename);
-void step_2_0(int file_num, const char * PATH, const char * filename);
 void step_2_1(int file_num, const char * PATH, const char * filename);
+//int is_dirty_data(const char buff[]);
+//void read_in(FILE ** fp, const char * PATH, const char * filename);
+//void write_in(FILE ** fp, const char * PATH, const char * filename);
+//int step_1(FILE * data, const char * PATH, const char * filename);
+//void step_2(int file_number_1, int file_number_2, const char * PATH, const char * filename);
+//void step_2_0(int file_num, const char * PATH, const char * filename);
 
-
-
-
-//    while (external_files.size() > 1)
-//    {
-//        int file_number_1 = external_files.front();
-//        external_files.pop();
-//        int file_number_2 = external_files.front();
-//        external_files.pop();
-//        output = get_output_filename(prefix, TOTAL_STAGE);
-//        step_2(file_number_1, file_number_2, PATH, output);
-//        TOTAL_STAGE++;
-//    }
-/*
-int main(int argc, char const *argv[])
-{
-    time_t start, end;
-    start = clock();
-
-
-
-
-    FILE * origin;
-	argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
-    char PATH[5 * MAX_LENGTH];
-    strcpy(PATH, argv[0]);
-    get_absolute_path(PATH);
-    read_in(&origin, PATH, FILENAME);
-    char * output;
-    while (!feof(origin))
-    {
-        output = get_output_filename(prefix, TOTAL_STAGE);
-        step_1(origin, PATH, output);
-        delete[] output;
-        TOTAL_STAGE++;
-        break;
-    }
-//    output = get_output_filename(prefix, TOTAL_STAGE);
-//    step_2_0(TOTAL_STAGE, PATH, output);
-//    TOTAL_STAGE++;
-    fclose(origin);
-
-
-
-
-
-    end = clock();
-    cout << (double)((end - start) / CLOCKS_PER_SEC) << endl;
-	return 0;
-}
-*/
 
 int main(int argc, char const *argv[])
 {
@@ -115,9 +59,70 @@ int main(int argc, char const *argv[])
 
 
     end = clock();
-    fprintf(stderr, "TOTAL TIME: %lgs\n", (double)((end - start) / CLOCKS_PER_SEC));
+    fprintf(stderr, "TOTAL TIME: %lgs\n", (end - start) / (double)CLOCKS_PER_SEC);
     return 0;
 }
+
+
+/*
+ * Really_old_method
+ * state : abandoned
+ * reason: low efficiency
+#include <queue>
+queue<int> external_files;
+while (external_files.size() > 1)
+{
+    int file_number_1 = external_files.front();
+    external_files.pop();
+    int file_number_2 = external_files.front();
+    external_files.pop();
+    output = get_output_filename(prefix, TOTAL_STAGE);
+    step_2(file_number_1, file_number_2, PATH, output);
+    TOTAL_STAGE++;
+}
+*/
+
+
+/*
+ * Old_method
+ * state : abandoned
+ * reason: too slow
+int main(int argc, char const *argv[])
+{
+    time_t start, end;
+    start = clock();
+
+
+
+
+    FILE * origin;
+    char PATH[5 * MAX_LENGTH];
+    strcpy(PATH, argv[0]);
+    get_absolute_path(PATH);
+    read_in(&origin, PATH, FILENAME);
+    char * output;
+    while (!feof(origin))
+    {
+        output = get_output_filename(prefix, TOTAL_STAGE);
+        step_1(origin, PATH, output);
+        delete[] output;
+        TOTAL_STAGE++;
+        break;
+    }
+    output = get_output_filename(prefix, TOTAL_STAGE);
+    step_2_0(TOTAL_STAGE, PATH, output);
+    TOTAL_STAGE++;
+    fclose(origin);
+
+
+
+
+
+    end = clock();
+    cout << (double)((end - start) / CLOCKS_PER_SEC) << endl;
+	return 0;
+}
+*/
 
 
 void next_patient_counter(int * patient_counter)
@@ -154,6 +159,11 @@ char * get_absolute_filename(const char * PATH, const char * filename)
 }
 
 
+/*
+ * Old_methods
+ * state : abandoned
+ * reason: the functions that based on these methods are abandoned
+#define FatalError(code) fprintf(stderr, code)
 void read_in(FILE ** fp, const char * PATH, const char * filename)
 {
     char document[5 * MAX_LENGTH];
@@ -172,6 +182,7 @@ void write_in(FILE ** fp, const char * PATH, const char * filename)
     if (NULL == (*fp = fopen(document,"w")))
         FatalError("Can not open the file!\n");
 }
+*/
 
 
 /*
@@ -206,6 +217,11 @@ void merge_sort(double A[], double temp[], int left, int right)
 */
 
 
+/*
+ * Used to get clean data
+ * state : abandoned
+ * reason: need too much time to clean the data
+#include <regex.h>
 int is_dirty_data(const char buff[])
 {
     const char * pattern = "^(-?[0-9]+)([.][0-9]+)?([eE][-+]?[0-9]+)?[\n]$";
@@ -250,6 +266,7 @@ void get_clean_data(FILE * data, const char * PATH, const char * filename)
     fprintf(stderr, "%d\n", counter);
 }
 //    get_clean_data(origin, PATH, "output/clean_data.txt");
+*/
 
 
 /*
@@ -278,6 +295,10 @@ char * get_output_filename(const char * prefix, int number)
 }
 
 
+/*
+ * Old_method
+ * state : abandoned
+ * reason: too slow
 int step_1(FILE * data, const char * PATH, const char * filename)
 {
     STEP1_STAGE++;
@@ -318,6 +339,7 @@ int step_1(FILE * data, const char * PATH, const char * filename)
     fclose(out);
     return flag;
 }
+*/
 
 
 double str2double(char str[])
@@ -402,13 +424,13 @@ void step_1_0(fstream * data, const char * absolute_filename)
             print_patient_info();
     }
     end = clock();
-    fprintf(stderr, "\b \b┃Time: %lgs\n", (double)((end - start) / CLOCKS_PER_SEC));
+    fprintf(stderr, "\b \b┃Time: %lgs\n", (end - start) / (double)CLOCKS_PER_SEC);
 
     fprintf(stderr, "┃Sorting...\n");
     mid = clock();
     sort(sorter, sorter + counter);
     end = clock();
-    fprintf(stderr, "┃Time: %lgs\n", (double)((end - mid) / CLOCKS_PER_SEC));
+    fprintf(stderr, "┃Time: %lgs\n", (end - mid) / (double)CLOCKS_PER_SEC);
 
     fprintf(stderr, "┃Storing...\n");
     mid = clock();
@@ -421,13 +443,17 @@ void step_1_0(fstream * data, const char * absolute_filename)
             print_patient_info();
     }
     end = clock();
-    fprintf(stderr, "\b \b┃Time: %lgs\n", (double)((end - mid) / CLOCKS_PER_SEC));
-    fprintf(stderr, "┗Finished [STEP_1: STAGE_%d]  Time spent:%lgs\n", STEP1_STAGE, (double)((end - start) / CLOCKS_PER_SEC));
+    fprintf(stderr, "\b \b┃Time: %lgs\n", (end - mid) / (double)CLOCKS_PER_SEC);
+    fprintf(stderr, "┗Finished [STEP_1: STAGE_%d]  Time spent:%lgs\n", STEP1_STAGE, (end - start) / (double)CLOCKS_PER_SEC);
     delete[] sorter;
     out.close();
 }
 
 
+/*
+ * Old_method
+ * state : abandoned
+ * reason: too slow
 void step_2(int file_number_1, int file_number_2, const char * PATH, const char * filename)
 {
     FILE * data_1;
@@ -574,8 +600,10 @@ void step_2_0(int file_num, const char * PATH, const char * filename)
     fprintf(stderr, "\b \b┃Removed intermediate file\n");
     fprintf(stderr, "┗Finished [STEP_2]\n");
 }
+*/
 
 
+// multi-way merge
 void step_2_1(int file_num, const char * PATH, const char * filename)
 {
     time_t start, end;
@@ -663,5 +691,5 @@ void step_2_1(int file_num, const char * PATH, const char * filename)
     out.close();
     fprintf(stderr, "\b \b┃Removed intermediate file\n");
     end = clock();
-    fprintf(stderr, "┗Finished [STEP_2] Time spent:%lgs\n", (double)((end - start) / CLOCKS_PER_SEC));
+    fprintf(stderr, "┗Finished [STEP_2] Time spent:%lgs\n", (end - start) / (double)CLOCKS_PER_SEC);
 }
