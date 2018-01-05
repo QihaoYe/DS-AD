@@ -39,7 +39,6 @@ int main(int argc, char const *argv[])
     start = clock();
 
 
-    argv[0] = "/Users/apple/Documents/Data_Structures/project/External_Sorting";
     char PATH[5 * MAX_LENGTH];
     strcpy(PATH, argv[0]);
     get_absolute_path(PATH);
