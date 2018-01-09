@@ -64,3 +64,7 @@ project/regex/regex.h
 !project/calculation.txt
 *.bin
 *.pdf
+*.docx
+12_29/ProblemSets/Compiler.sh~
+12_29/ProblemSets/q.cpp
+12_29/ProblemSets/test
